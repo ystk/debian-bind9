@@ -14,7 +14,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: nsec3.c,v 1.13.6.5 2010/06/02 00:41:34 marka Exp $ */
+/* $Id: nsec3.c,v 1.13.6.6 2010-12-07 03:01:40 marka Exp $ */
 
 #include <config.h>
 
@@ -1143,6 +1143,7 @@ dns_nsec3param_deletechains(dns_db_t *db, dns_dbversion_t *ver,
 		CHECK(do_one_tuple(&tuple, db, ver, diff));
 		INSIST(tuple == NULL);
 
+		rdata.data = buf;
 		buf[2] = DNS_NSEC3FLAG_REMOVE | DNS_NSEC3FLAG_NONSEC;
 
 		CHECK(rr_exists(db, ver, origin, &rdata, &flag));
@@ -1578,7 +1579,7 @@ dns_nsec3_delnsec3s(dns_db_t *db, dns_dbversion_t *version, dns_name_t *name,
 
 isc_result_t
 dns_nsec3_delnsec3sx(dns_db_t *db, dns_dbversion_t *version, dns_name_t *name,
-		     dns_rdatatype_t type, dns_diff_t *diff)
+		     dns_rdatatype_t privatetype, dns_diff_t *diff)
 {
 	dns_dbnode_t *node = NULL;
 	dns_rdata_nsec3param_t nsec3param;
@@ -1623,9 +1624,9 @@ dns_nsec3_delnsec3sx(dns_db_t *db, dns_dbversion_t *version, dns_name_t *name,
 	dns_rdataset_disassociate(&rdataset);
 
  try_private:
-	if (type == 0)
+	if (privatetype == 0)
 		goto success;
-	result = dns_db_findrdataset(db, node, version, type, 0, 0,
+	result = dns_db_findrdataset(db, node, version, privatetype, 0, 0,
 				     &rdataset, NULL);
 	if (result == ISC_R_NOTFOUND)
 		goto success;
@@ -1680,7 +1681,7 @@ dns_nsec3_active(dns_db_t *db, dns_dbversion_t *version,
 
 isc_result_t
 dns_nsec3_activex(dns_db_t *db, dns_dbversion_t *version,
-		  isc_boolean_t complete, dns_rdatatype_t type,
+		  isc_boolean_t complete, dns_rdatatype_t privatetype,
 		  isc_boolean_t *answer)
 {
 	dns_dbnode_t *node = NULL;
@@ -1729,11 +1730,11 @@ dns_nsec3_activex(dns_db_t *db, dns_dbversion_t *version,
 		*answer = ISC_FALSE;
 
  try_private:
-	if (type == 0 || complete) {
+	if (privatetype == 0 || complete) {
 		*answer = ISC_FALSE;
 		return (ISC_R_SUCCESS);
 	}
-	result = dns_db_findrdataset(db, node, version, type, 0, 0,
+	result = dns_db_findrdataset(db, node, version, privatetype, 0, 0,
 				     &rdataset, NULL);
 
 	dns_db_detachnode(db, &node);

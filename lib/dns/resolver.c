@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2011  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: resolver.c,v 1.413.14.11.6.2 2010/09/15 12:24:38 marka Exp $ */
+/* $Id: resolver.c,v 1.413.14.15 2011-01-27 23:46:37 tbox Exp $ */
 
 /*! \file */
 
@@ -426,6 +426,7 @@ struct dns_resolver {
 					 FCTX_ADDRINFO_TRIED) != 0)
 
 #define NXDOMAIN(r) (((r)->attributes & DNS_RDATASETATTR_NXDOMAIN) != 0)
+#define NEGATIVE(r) (((r)->attributes & DNS_RDATASETATTR_NEGATIVE) != 0)
 
 static void destroy(dns_resolver_t *res);
 static void empty_bucket(dns_resolver_t *res);
@@ -1052,7 +1053,7 @@ fctx_sendevents(fetchctx_t *fctx, isc_result_t result, int line) {
 		 * Negative results must be indicated in event->result.
 		 */
 		if (dns_rdataset_isassociated(event->rdataset) &&
-		    event->rdataset->type == dns_rdatatype_none) {
+		    NEGATIVE(event->rdataset)) {
 			INSIST(event->result == DNS_R_NCACHENXDOMAIN ||
 			       event->result == DNS_R_NCACHENXRRSET);
 		}
@@ -4221,7 +4222,7 @@ validated(isc_task_t *task, isc_event_t *event) {
 	if (result != ISC_R_SUCCESS &&
 	    result != DNS_R_UNCHANGED)
 		goto noanswer_response;
-	if (ardataset != NULL && ardataset->type == 0) {
+	if (ardataset != NULL && NEGATIVE(ardataset)) {
 		if (NXDOMAIN(ardataset))
 			eresult = DNS_R_NCACHENXDOMAIN;
 		else
@@ -4548,7 +4549,7 @@ cache_name(fetchctx_t *fctx, dns_name_t *name, dns_adbaddrinfo_t *addrinfo,
 					result = ISC_R_SUCCESS;
 					if (!need_validation &&
 					    ardataset != NULL &&
-					    ardataset->type == 0) {
+					    NEGATIVE(ardataset)) {
 						/*
 						 * The answer in the cache is
 						 * better than the answer we
@@ -4678,7 +4679,7 @@ cache_name(fetchctx_t *fctx, dns_name_t *name, dns_adbaddrinfo_t *addrinfo,
 			if (result == DNS_R_UNCHANGED) {
 				if (ANSWER(rdataset) &&
 				    ardataset != NULL &&
-				    ardataset->type == 0) {
+				    NEGATIVE(ardataset)) {
 					/*
 					 * The answer in the cache is better
 					 * than the answer we found, and is
@@ -4708,7 +4709,7 @@ cache_name(fetchctx_t *fctx, dns_name_t *name, dns_adbaddrinfo_t *addrinfo,
 			 * Negative results must be indicated in event->result.
 			 */
 			if (dns_rdataset_isassociated(event->rdataset) &&
-			    event->rdataset->type == dns_rdatatype_none) {
+			    NEGATIVE(event->rdataset)) {
 				INSIST(eresult == DNS_R_NCACHENXDOMAIN ||
 				       eresult == DNS_R_NCACHENXRRSET);
 			}
@@ -4788,7 +4789,7 @@ ncache_adderesult(dns_message_t *message, dns_db_t *cache, dns_dbnode_t *node,
 		 * care about whether it is DNS_R_NCACHENXDOMAIN or
 		 * DNS_R_NCACHENXRRSET then extract it.
 		 */
-		if (ardataset->type == 0) {
+		if (NEGATIVE(ardataset)) {
 			/*
 			 * The cache data is a negative cache entry.
 			 */
@@ -7832,6 +7833,13 @@ static inline isc_boolean_t
 fctx_match(fetchctx_t *fctx, dns_name_t *name, dns_rdatatype_t type,
 	   unsigned int options)
 {
+	/*
+	 * Don't match fetch contexts that are shutting down.
+	 */
+	if (fctx->cloned || fctx->state == fetchstate_done ||
+	    ISC_LIST_EMPTY(fctx->events))
+		return (ISC_FALSE);
+
 	if (fctx->type != type || fctx->options != options)
 		return (ISC_FALSE);
 	return (dns_name_equal(&fctx->name, name));
@@ -7966,17 +7974,7 @@ dns_resolver_createfetch2(dns_resolver_t *res, dns_name_t *name,
 		}
 	}
 
-	/*
-	 * If we didn't have a fetch, would attach to a done fetch, this
-	 * fetch has already cloned its results, or if the fetch has gone
-	 * "idle" (no one was interested in it), we need to start a new
-	 * fetch instead of joining with the existing one.
-	 */
-	if (fctx == NULL ||
-	    fctx->state == fetchstate_done ||
-	    fctx->cloned ||
-	    ISC_LIST_EMPTY(fctx->events)) {
-		fctx = NULL;
+	if (fctx == NULL) {
 		result = fctx_create(res, name, type, domain, nameservers,
 				     options, bucketnum, &fctx);
 		if (result != ISC_R_SUCCESS)
@@ -8379,6 +8377,7 @@ dns_resolver_addbadcache(dns_resolver_t *resolver, dns_name_t *name,
 		}
 		bad->type = type;
 		bad->hashval = hashval;
+		bad->expire = *expire;
 		isc_buffer_init(&buffer, bad + 1, name->length);
 		dns_name_init(&bad->name, NULL);
 		dns_name_copy(name, &bad->name, &buffer);
@@ -8390,8 +8389,8 @@ dns_resolver_addbadcache(dns_resolver_t *resolver, dns_name_t *name,
 		if (resolver->badcount < resolver->badhash * 2 &&
 		    resolver->badhash > DNS_BADCACHE_SIZE)
 			resizehash(resolver, &now, ISC_FALSE);
-	}
-	bad->expire = *expire;
+	} else
+		bad->expire = *expire;
  cleanup:
 	UNLOCK(&resolver->lock);
 }

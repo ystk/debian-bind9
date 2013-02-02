@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: rbtdb.c,v 1.292.8.12.6.1 2010/11/16 07:04:09 marka Exp $ */
+/* $Id: rbtdb.c,v 1.292.8.15 2010-12-02 05:07:03 marka Exp $ */
 
 /*! \file */
 
@@ -278,6 +278,7 @@ typedef ISC_LIST(dns_rbtnode_t)         rbtnodelist_t;
 #define RDATASET_ATTR_RESIGN            0x0020
 #define RDATASET_ATTR_STATCOUNT         0x0040
 #define RDATASET_ATTR_OPTOUT		0x0080
+#define RDATASET_ATTR_NEGATIVE          0x0100
 
 typedef struct acache_cbarg {
 	dns_rdatasetadditional_t        type;
@@ -316,6 +317,8 @@ struct acachectl {
 	(((header)->attributes & RDATASET_ATTR_RESIGN) != 0)
 #define OPTOUT(header) \
 	(((header)->attributes & RDATASET_ATTR_OPTOUT) != 0)
+#define NEGATIVE(header) \
+	(((header)->attributes & RDATASET_ATTR_NEGATIVE) != 0)
 
 #define DEFAULT_NODE_LOCK_COUNT         7       /*%< Should be prime. */
 
@@ -691,11 +694,13 @@ update_rrsetstats(dns_rbtdb_t *rbtdb, rdatasetheader_t *header,
 	/* At the moment we count statistics only for cache DB */
 	INSIST(IS_CACHE(rbtdb));
 
-	if (NXDOMAIN(header))
-		statattributes = DNS_RDATASTATSTYPE_ATTR_NXDOMAIN;
-	else if (RBTDB_RDATATYPE_BASE(header->type) == 0) {
-		statattributes = DNS_RDATASTATSTYPE_ATTR_NXRRSET;
-		base = RBTDB_RDATATYPE_EXT(header->type);
+	if (NEGATIVE(header)) {
+		if (NXDOMAIN(header))
+			statattributes = DNS_RDATASTATSTYPE_ATTR_NXDOMAIN;
+		else {
+			statattributes = DNS_RDATASTATSTYPE_ATTR_NXRRSET;
+			base = RBTDB_RDATATYPE_EXT(header->type);
+		}
 	} else
 		base = RBTDB_RDATATYPE_BASE(header->type);
 
@@ -2115,7 +2120,7 @@ cleanup_dead_nodes_callback(isc_task_t *task, isc_event_t *event) {
 	unsigned int locknum;
 	unsigned int refs;
 
-	RBTDB_LOCK(&rbtdb->lock, isc_rwlocktype_write);
+	RWLOCK(&rbtdb->tree_lock, isc_rwlocktype_write);
 	for (locknum = 0; locknum < rbtdb->node_lock_count; locknum++) {
 		NODE_LOCK(&rbtdb->node_locks[locknum].lock,
 			  isc_rwlocktype_write);
@@ -2125,7 +2130,7 @@ cleanup_dead_nodes_callback(isc_task_t *task, isc_event_t *event) {
 		NODE_UNLOCK(&rbtdb->node_locks[locknum].lock,
 			    isc_rwlocktype_write);
 	}
-	RBTDB_UNLOCK(&rbtdb->lock, isc_rwlocktype_write);
+	RWUNLOCK(&rbtdb->tree_lock, isc_rwlocktype_write);
 	if (again)
 		isc_task_send(task, &event);
 	else {
@@ -2748,6 +2753,8 @@ bind_rdataset(dns_rbtdb_t *rbtdb, dns_rbtnode_t *node,
 	rdataset->covers = RBTDB_RDATATYPE_EXT(header->type);
 	rdataset->ttl = header->rdh_ttl - now;
 	rdataset->trust = header->trust;
+	if (NEGATIVE(header))
+		rdataset->attributes |= DNS_RDATASETATTR_NEGATIVE;
 	if (NXDOMAIN(header))
 		rdataset->attributes |= DNS_RDATASETATTR_NXDOMAIN;
 	if (OPTOUT(header))
@@ -4785,7 +4792,7 @@ cache_find(dns_db_t *db, dns_name_t *name, dns_dbversion_t *version,
 		*nodep = node;
 	}
 
-	if (RBTDB_RDATATYPE_BASE(found->type) == 0) {
+	if (NEGATIVE(found)) {
 		/*
 		 * We found a negative cache entry.
 		 */
@@ -4815,7 +4822,7 @@ cache_find(dns_db_t *db, dns_name_t *name, dns_dbversion_t *version,
 			      rdataset);
 		if (need_headerupdate(found, search.now))
 			update = found;
-		if (foundsig != NULL) {
+		if (!NEGATIVE(found) && foundsig != NULL) {
 			bind_rdataset(search.rbtdb, node, foundsig, search.now,
 				      sigrdataset);
 			if (need_headerupdate(foundsig, search.now))
@@ -5444,7 +5451,7 @@ cache_findrdataset(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
 	}
 	if (found != NULL) {
 		bind_rdataset(rbtdb, rbtnode, found, now, rdataset);
-		if (foundsig != NULL)
+		if (!NEGATIVE(found) && foundsig != NULL)
 			bind_rdataset(rbtdb, rbtnode, foundsig, now,
 				      sigrdataset);
 	}
@@ -5454,7 +5461,7 @@ cache_findrdataset(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
 	if (found == NULL)
 		return (ISC_R_NOTFOUND);
 
-	if (RBTDB_RDATATYPE_BASE(found->type) == 0) {
+	if (NEGATIVE(found)) {
 		/*
 		 * We found a negative cache entry.
 		 */
@@ -5665,7 +5672,7 @@ add(dns_rbtdb_t *rbtdb, dns_rbtnode_t *rbtnode, rbtdb_version_t *rbtversion,
 	negtype = 0;
 	if (rbtversion == NULL && !newheader_nx) {
 		rdtype = RBTDB_RDATATYPE_BASE(newheader->type);
-		if (rdtype == 0) {
+		if (NEGATIVE(newheader)) {
 			/*
 			 * We're adding a negative cache entry.
 			 */
@@ -6207,6 +6214,8 @@ addrdataset(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
 	} else {
 		newheader->serial = 1;
 		newheader->resign = 0;
+		if ((rdataset->attributes & DNS_RDATASETATTR_NEGATIVE) != 0)
+			newheader->attributes |= RDATASET_ATTR_NEGATIVE;
 		if ((rdataset->attributes & DNS_RDATASETATTR_NXDOMAIN) != 0)
 			newheader->attributes |= RDATASET_ATTR_NXDOMAIN;
 		if ((rdataset->attributes & DNS_RDATASETATTR_OPTOUT) != 0)
@@ -7391,6 +7400,8 @@ dns_rbtdb_create
 	 * change.
 	 */
 	if (!IS_CACHE(rbtdb)) {
+		dns_rbtnode_t *nsec3node;
+
 		rbtdb->origin_node = NULL;
 		result = dns_rbt_addnode(rbtdb->tree, &rbtdb->common.origin,
 					 &rbtdb->origin_node);
@@ -7412,6 +7423,32 @@ dns_rbtdb_create
 #else
 		rbtdb->origin_node->locknum =
 			dns_name_hash(&name, ISC_TRUE) %
+			rbtdb->node_lock_count;
+#endif
+		/*
+		 * Add an apex node to the NSEC3 tree so that NSEC3 searches
+		 * return partial matches when there is only a single NSEC3
+		 * record in the tree.
+		 */
+		nsec3node = NULL;
+		result = dns_rbt_addnode(rbtdb->nsec3, &rbtdb->common.origin,
+					 &nsec3node);
+		if (result != ISC_R_SUCCESS) {
+			INSIST(result != ISC_R_EXISTS);
+			free_rbtdb(rbtdb, ISC_FALSE, NULL);
+			return (result);
+		}
+		nsec3node->nsec = DNS_RBT_NSEC_NSEC3;
+		/*
+		 * We need to give the nsec3 origin node the right locknum.
+		 */
+		dns_name_init(&name, NULL);
+		dns_rbt_namefromnode(nsec3node, &name);
+#ifdef DNS_RBT_USEHASH
+		nsec3node->locknum = nsec3node->hashval %
+			rbtdb->node_lock_count;
+#else
+		nsec3node->locknum = dns_name_hash(&name, ISC_TRUE) %
 			rbtdb->node_lock_count;
 #endif
 	}
@@ -7871,7 +7908,7 @@ rdatasetiter_next(dns_rdatasetiter_t *iterator) {
 
 	type = header->type;
 	rdtype = RBTDB_RDATATYPE_BASE(header->type);
-	if (rdtype == 0) {
+	if (NEGATIVE(header)) {
 		covers = RBTDB_RDATATYPE_EXT(header->type);
 		negtype = RBTDB_RDATATYPE_VALUE(covers, 0);
 	} else

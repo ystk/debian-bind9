@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: master.c,v 1.178 2009/09/01 00:22:26 jinmei Exp $ */
+/* $Id: master.c,v 1.178 2009-09-01 00:22:26 jinmei Exp $ */
 
 /*! \file */
 
@@ -75,7 +75,7 @@
 /*%
  * max message size - header - root - type - class - ttl - rdlen
  */
-#define MINTSIZ (65535 - 12 - 1 - 2 - 2 - 4 - 2)
+#define MINTSIZ DNS_RDATA_MAXLENGTH
 /*%
  * Size for tokens in the presentation format,
  * The largest tokens are the base64 blocks in KEY and CERT records,

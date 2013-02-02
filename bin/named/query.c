@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: query.c,v 1.335.8.8.6.2 2010/09/24 06:32:56 marka Exp $ */
+/* $Id: query.c,v 1.335.8.11 2010-09-24 05:54:05 marka Exp $ */
 
 /*! \file */
 
@@ -1024,13 +1024,6 @@ query_isduplicate(ns_client_t *client, dns_name_t *name,
 		mname = NULL;
 	}
 
-	/*
-	 * If the dns_name_t we're looking up is already in the message,
-	 * we don't want to trigger the caller's name replacement logic.
-	 */
-	if (name == mname)
-		mname = NULL;
-
 	*mnamep = mname;
 
 	CTRACE("query_isduplicate: false: done");
@@ -1228,6 +1221,7 @@ query_addadditional(void *arg, dns_name_t *name, dns_rdatatype_t qtype) {
 	if (dns_rdataset_isassociated(rdataset) &&
 	    !query_isduplicate(client, fname, type, &mname)) {
 		if (mname != NULL) {
+			INSIST(mname != fname);
 			query_releasename(client, &fname);
 			fname = mname;
 		} else
@@ -1280,21 +1274,21 @@ query_addadditional(void *arg, dns_name_t *name, dns_rdatatype_t qtype) {
 			goto addname;
 		if (result == DNS_R_NCACHENXRRSET) {
 			dns_rdataset_disassociate(rdataset);
-			/*
-			 * Negative cache entries don't have sigrdatasets.
-			 */
-			INSIST(sigrdataset == NULL ||
-			       ! dns_rdataset_isassociated(sigrdataset));
+			if (sigrdataset != NULL &&
+			    dns_rdataset_isassociated(sigrdataset))
+				dns_rdataset_disassociate(sigrdataset);
 		}
 		if (result == ISC_R_SUCCESS) {
 			mname = NULL;
 			if (!query_isduplicate(client, fname,
 					       dns_rdatatype_a, &mname)) {
-				if (mname != NULL) {
-					query_releasename(client, &fname);
-					fname = mname;
-				} else
-					need_addname = ISC_TRUE;
+				if (mname != fname) {
+					if (mname != NULL) {
+						query_releasename(client, &fname);
+						fname = mname;
+					} else
+						need_addname = ISC_TRUE;
+				}
 				ISC_LIST_APPEND(fname->list, rdataset, link);
 				added_something = ISC_TRUE;
 				if (sigrdataset != NULL &&
@@ -1325,18 +1319,21 @@ query_addadditional(void *arg, dns_name_t *name, dns_rdatatype_t qtype) {
 			goto addname;
 		if (result == DNS_R_NCACHENXRRSET) {
 			dns_rdataset_disassociate(rdataset);
-			INSIST(sigrdataset == NULL ||
-			       ! dns_rdataset_isassociated(sigrdataset));
+			if (sigrdataset != NULL &&
+			    dns_rdataset_isassociated(sigrdataset))
+				dns_rdataset_disassociate(sigrdataset);
 		}
 		if (result == ISC_R_SUCCESS) {
 			mname = NULL;
 			if (!query_isduplicate(client, fname,
 					       dns_rdatatype_aaaa, &mname)) {
-				if (mname != NULL) {
-					query_releasename(client, &fname);
-					fname = mname;
-				} else
-					need_addname = ISC_TRUE;
+				if (mname != fname) {
+					if (mname != NULL) {
+						query_releasename(client, &fname);
+						fname = mname;
+					} else
+						need_addname = ISC_TRUE;
+				}
 				ISC_LIST_APPEND(fname->list, rdataset, link);
 				added_something = ISC_TRUE;
 				if (sigrdataset != NULL &&
@@ -1775,10 +1772,8 @@ query_addadditional2(void *arg, dns_name_t *name, dns_rdatatype_t qtype) {
 		goto setcache;
 	if (result == DNS_R_NCACHENXRRSET) {
 		dns_rdataset_disassociate(rdataset);
-		/*
-		 * Negative cache entries don't have sigrdatasets.
-		 */
-		INSIST(! dns_rdataset_isassociated(sigrdataset));
+		if (dns_rdataset_isassociated(sigrdataset))
+			dns_rdataset_disassociate(sigrdataset);
 	}
 	if (result == ISC_R_SUCCESS) {
 		/* Remember the result as a cache */
@@ -1849,22 +1844,24 @@ query_addadditional2(void *arg, dns_name_t *name, dns_rdatatype_t qtype) {
 		    crdataset->type == dns_rdatatype_aaaa) {
 			if (!query_isduplicate(client, fname, crdataset->type,
 					       &mname)) {
-				if (mname != NULL) {
-					/*
-					 * A different type of this name is
-					 * already stored in the additional
-					 * section.  We'll reuse the name.
-					 * Note that this should happen at most
-					 * once.  Otherwise, fname->link could
-					 * leak below.
-					 */
-					INSIST(mname0 == NULL);
+				if (mname != fname) {
+					if (mname != NULL) {
+						/*
+						 * A different type of this name is
+						 * already stored in the additional
+						 * section.  We'll reuse the name.
+						 * Note that this should happen at most
+						 * once.  Otherwise, fname->link could
+						 * leak below.
+						 */
+						INSIST(mname0 == NULL);
 
-					query_releasename(client, &fname);
-					fname = mname;
-					mname0 = mname;
-				} else
-					need_addname = ISC_TRUE;
+						query_releasename(client, &fname);
+						fname = mname;
+						mname0 = mname;
+					} else
+						need_addname = ISC_TRUE;
+				}
 				ISC_LIST_UNLINK(cfname.list, crdataset, link);
 				ISC_LIST_APPEND(fname->list, crdataset, link);
 				added_something = ISC_TRUE;
@@ -2796,7 +2793,7 @@ query_addds(ns_client_t *client, dns_db_t *db, dns_dbnode_t *node,
 static void
 query_addwildcardproof(ns_client_t *client, dns_db_t *db,
 		       dns_dbversion_t *version, dns_name_t *name,
-		       isc_boolean_t ispositive)
+		       isc_boolean_t ispositive, isc_boolean_t nodata)
 {
 	isc_buffer_t *dbuf, b;
 	dns_name_t *fname;
@@ -2984,7 +2981,7 @@ query_addwildcardproof(ns_client_t *client, dns_db_t *db,
 			goto cleanup;
 
 		query_findclosestnsec3(wname, db, NULL, client, rdataset,
-				       sigrdataset, fname, ISC_FALSE, NULL);
+				       sigrdataset, fname, nodata, NULL);
 		if (!dns_rdataset_isassociated(rdataset))
 			goto cleanup;
 		query_addrrset(client, &fname, &rdataset, &sigrdataset,
@@ -3087,7 +3084,7 @@ query_addnxrrsetnsec(ns_client_t *client, dns_db_t *db,
 
 	/* XXX */
 	query_addwildcardproof(client, db, version, client->query.qname,
-			       ISC_TRUE);
+			       ISC_TRUE, ISC_FALSE);
 
 	/*
 	 * We'll need some resources...
@@ -4327,7 +4324,7 @@ query_find(ns_client_t *client, dns_fetchevent_t *event, dns_rdatatype_t qtype)
 				query_releasename(client, &fname);
 				query_addwildcardproof(client, db, version,
 						       client->query.qname,
-						       ISC_FALSE);
+						       ISC_FALSE, ISC_TRUE);
 			}
 		}
 		if (dns_rdataset_isassociated(rdataset)) {
@@ -4416,7 +4413,8 @@ query_find(ns_client_t *client, dns_fetchevent_t *event, dns_rdatatype_t qtype)
 					       &sigrdataset,
 					       NULL, DNS_SECTION_AUTHORITY);
 			query_addwildcardproof(client, db, version,
-					       client->query.qname, ISC_FALSE);
+					       client->query.qname, ISC_FALSE,
+					       ISC_FALSE);
 		}
 
 		/*
@@ -4989,7 +4987,7 @@ query_find(ns_client_t *client, dns_fetchevent_t *event, dns_rdatatype_t qtype)
 	if (need_wildcardproof && dns_db_issecure(db))
 		query_addwildcardproof(client, db, version,
 				       dns_fixedname_name(&wildcardname),
-				       ISC_TRUE);
+				       ISC_TRUE, ISC_FALSE);
  cleanup:
 	CTRACE("query_find: cleanup");
 	/*
