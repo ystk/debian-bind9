@@ -1,3 +1,21 @@
+bind9 (1:9.7.3.dfsg-1~squeeze10) squeeze-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Compile without regular expression support to fix CVE-2013-2266.
+    Prevent a denial of service vulnerability found in the libdns
+    library. A remote attacker could use this flaw to send a specially-
+    crafted DNS query to named that, when processed, would cause
+    named to use an excessive amount of memory, or possibly crash.
+    (Closes: #704174)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Fri, 29 Mar 2013 08:03:20 +0100
+
+bind9 (1:9.7.3.dfsg-1~squeeze9) squeeze-proposed-updates; urgency=low
+
+  * Update db.root with new IP for D.root-servers.net.  Closes: #697352
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 08 Jan 2013 07:07:02 -0700
+
 bind9 (1:9.7.3.dfsg-1~squeeze8) squeeze-security; urgency=high
 
   * Apply patch extracted from 9.7.6-P4 to fix CVE-2012-5166
@@ -1519,4 +1537,3 @@ bind9 (1:9.1.0-1) unstable; urgency=low
   * snarf a couple of man pages from the 8.X tree for now
 
  -- Bdale Garbee <bdale@gag.com>  Thu,  1 Feb 2001 16:30:35 -0700
-
