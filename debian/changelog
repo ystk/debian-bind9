@@ -1,3 +1,12 @@
+bind9 (1:9.7.3.dfsg-1~squeeze11) squeeze-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * CVE-2013-4854: A specially crafted query that includes malformed rdata can
+    cause named to terminate with an assertion failure while rejecting the
+    malformed query. (Closes: #717936).
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sat, 27 Jul 2013 11:09:40 +0200
+
 bind9 (1:9.7.3.dfsg-1~squeeze10) squeeze-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
