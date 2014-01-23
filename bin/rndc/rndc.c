@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2011  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: rndc.c,v 1.126.66.4 2010/07/11 00:12:18 each Exp $ */
+/* $Id: rndc.c,v 1.131.20.3 2011/11/03 22:06:31 each Exp $ */
 
 /*! \file */
 
@@ -96,7 +96,7 @@ usage(int status) ISC_PLATFORM_NORETURN_POST;
 static void
 usage(int status) {
 	fprintf(stderr, "\
-Usage: %s [-c config] [-s server] [-p port]\n\
+Usage: %s [-b address] [-c config] [-s server] [-p port]\n\
 	[-k key-file ] [-y key] [-V] command\n\
 \n\
 command is one of the following:\n\
@@ -119,6 +119,8 @@ command is one of the following:\n\
   reconfig	Reload configuration file and new zones only.\n\
   sign zone [class [view]]\n\
 		Update zone keys, and sign as needed.\n\
+  loadkeys zone [class [view]]\n\
+		Update keys without signing immediately.\n\
   stats		Write server statistics to the statistics file.\n\
   querylog	Toggle query logging.\n\
   dumpdb [-all|-cache|-zones] [view ...]\n\
@@ -140,13 +142,17 @@ command is one of the following:\n\
 		Flush the given name from the server's cache(s)\n\
   status	Display status of the server.\n\
   recursing	Dump the queries that are currently recursing (named.recursing)\n\
+  tsig-list	List all currently active TSIG keys, including both statically\n\
+		configured and TKEY-negotiated keys.\n\
+  tsig-delete keyname [view]	\n\
+		Delete a TKEY-negotiated TSIG key.\n\
   validation newstate [view]\n\
 		Enable / disable DNSSEC validation.\n\
-  *restart	Restart the server.\n\
   addzone [\"file\"] zone [class [view]] { zone-options }\n\
 		Add zone to given view. Requires new-zone-file option.\n\
   delzone [\"file\"] zone [class [view]]\n\
 		Removes zone from given view. Requires new-zone-file option.\n\
+  *restart	Restart the server.\n\
 \n\
 * == not yet implemented\n\
 Version: %s\n",

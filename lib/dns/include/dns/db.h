@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2009, 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: db.h,v 1.102 2009/11/25 23:49:22 tbox Exp $ */
+/* $Id$ */
 
 #ifndef DNS_DB_H
 #define DNS_DB_H 1
@@ -63,6 +63,7 @@
 #include <dns/name.h>
 #include <dns/rdata.h>
 #include <dns/rdataset.h>
+#include <dns/rpz.h>
 #include <dns/types.h>
 
 ISC_LANG_BEGINDECLS
@@ -170,6 +171,9 @@ typedef struct dns_dbmethods {
 					   dns_dbversion_t *version);
 	isc_boolean_t	(*isdnssec)(dns_db_t *db);
 	dns_stats_t	*(*getrrsetstats)(dns_db_t *db);
+	void		(*rpz_attach)(dns_db_t *db, dns_rpz_zones_t *rpzs,
+				      dns_rpz_num_t rpz_num);
+	isc_result_t	(*rpz_ready)(dns_db_t *db);
 } dns_dbmethods_t;
 
 typedef isc_result_t
@@ -1433,7 +1437,9 @@ dns_db_setsigningtime(dns_db_t *db, dns_rdataset_t *rdataset,
  *
  * Requires:
  * \li	'db' is a valid zone database.
- * \li	'rdataset' to be associated with 'db'.
+ * \li	'rdataset' is or is to be associated with 'db'.
+ * \li  'rdataset' is not pending removed from the heap via an
+ *       uncommitted call to dns_db_resigned().
  *
  * Returns:
  * \li	#ISC_R_SUCCESS
@@ -1464,7 +1470,9 @@ dns_db_resigned(dns_db_t *db, dns_rdataset_t *rdataset,
  * Mark 'rdataset' as not being available to be returned by
  * dns_db_getsigningtime().  If the changes associated with 'version'
  * are committed this will be permanent.  If the version is not committed
- * this change will be rolled back when the version is closed.
+ * this change will be rolled back when the version is closed.  Until
+ * 'version' is either committed or rolled back, 'rdataset' can no longer
+ * be acted upon by dns_db_setsigningtime().
  *
  * Requires:
  * \li	'db' is a valid zone database.
@@ -1485,6 +1493,19 @@ dns_db_getrrsetstats(dns_db_t *db);
  * Returns:
  * \li	when available, a pointer to a statistics object created by
  *	dns_rdatasetstats_create(); otherwise NULL.
+ */
+
+void
+dns_db_rpz_attach(dns_db_t *db, dns_rpz_zones_t *rpzs, dns_rpz_num_t rpz_num);
+/*%<
+ * Attach the response policy information for a view to a database for a
+ * zone for the view.
+ */
+
+isc_result_t
+dns_db_rpz_ready(dns_db_t *db);
+/*%<
+ * Finish loading a response policy zone.
  */
 
 ISC_LANG_ENDDECLS

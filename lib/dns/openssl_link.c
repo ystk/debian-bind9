@@ -1,5 +1,5 @@
 /*
- * Portions Copyright (C) 2004-2009  Internet Systems Consortium, Inc. ("ISC")
+ * Portions Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -31,7 +31,7 @@
 
 /*
  * Principal Author: Brian Wellington
- * $Id: openssl_link.c,v 1.27 2009/10/05 17:30:49 fdupont Exp $
+ * $Id$
  */
 #ifdef OPENSSL
 
@@ -45,20 +45,12 @@
 #include <isc/thread.h>
 #include <isc/util.h>
 
+#include <dns/log.h>
+
 #include <dst/result.h>
 
 #include "dst_internal.h"
 #include "dst_openssl.h"
-
-#include <openssl/err.h>
-#include <openssl/rand.h>
-#include <openssl/evp.h>
-#include <openssl/conf.h>
-#include <openssl/crypto.h>
-
-#if defined(CRYPTO_LOCK_ENGINE) && (OPENSSL_VERSION_NUMBER >= 0x0090707f)
-#define USE_ENGINE 1
-#endif
 
 #ifdef USE_ENGINE
 #include <openssl/engine.h>
@@ -79,7 +71,7 @@ entropy_get(unsigned char *buf, int num) {
 	if (num < 0)
 		return (-1);
 	result = dst__entropy_getdata(buf, (unsigned int) num, ISC_FALSE);
-	return (result == ISC_R_SUCCESS ? num : -1);
+	return (result == ISC_R_SUCCESS ? 1 : -1);
 }
 
 static int
@@ -93,7 +85,7 @@ entropy_getpseudo(unsigned char *buf, int num) {
 	if (num < 0)
 		return (-1);
 	result = dst__entropy_getdata(buf, (unsigned int) num, ISC_TRUE);
-	return (result == ISC_R_SUCCESS ? num : -1);
+	return (result == ISC_R_SUCCESS ? 1 : -1);
 }
 
 static void
@@ -181,6 +173,8 @@ dst__openssl_init(const char *engine) {
 		goto cleanup_mutexalloc;
 	CRYPTO_set_locking_callback(lock_callback);
 	CRYPTO_set_id_callback(id_callback);
+
+	ERR_load_crypto_strings();
 
 	rm = mem_alloc(sizeof(RAND_METHOD));
 	if (rm == NULL) {
@@ -295,7 +289,7 @@ dst__openssl_destroy() {
 isc_result_t
 dst__openssl_toresult(isc_result_t fallback) {
 	isc_result_t result = fallback;
-	int err = ERR_get_error();
+	unsigned long err = ERR_get_error();
 
 	switch (ERR_GET_REASON(err)) {
 	case ERR_R_MALLOC_FAILURE:
@@ -308,19 +302,53 @@ dst__openssl_toresult(isc_result_t fallback) {
 	return (result);
 }
 
+isc_result_t
+dst__openssl_toresult2(const char *funcname, isc_result_t fallback) {
+	isc_result_t result = fallback;
+	unsigned long err = ERR_peek_error();
+	const char *file, *data;
+	int line, flags;
+	char buf[256];
+
+	switch (ERR_GET_REASON(err)) {
+	case ERR_R_MALLOC_FAILURE:
+		result = ISC_R_NOMEMORY;
+		goto done;
+	default:
+		break;
+	}
+	isc_log_write(dns_lctx, DNS_LOGCATEGORY_GENERAL,
+		      DNS_LOGMODULE_CRYPTO, ISC_LOG_WARNING,
+		      "%s failed", funcname);
+	for (;;) {
+		err = ERR_get_error_line_data(&file, &line, &data, &flags);
+		if (err == 0U)
+			goto done;
+		ERR_error_string_n(err, buf, sizeof(buf));
+		isc_log_write(dns_lctx, DNS_LOGCATEGORY_GENERAL,
+			      DNS_LOGMODULE_CRYPTO, ISC_LOG_INFO,
+			      "%s:%s:%d:%s", buf, file, line,
+			      (flags & ERR_TXT_STRING) ? data : "");
+	}
+
+    done:
+	ERR_clear_error();
+	return (result);
+}
+
+#if defined(USE_ENGINE)
 ENGINE *
 dst__openssl_getengine(const char *engine) {
 
 	if (engine == NULL)
 		return (NULL);
-#if defined(USE_ENGINE)
 	if (e == NULL)
 		return (NULL);
 	if (strcmp(engine, ENGINE_get_id(e)) == 0)
 		return (e);
-#endif
 	return (NULL);
 }
+#endif
 
 #else /* OPENSSL */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2010, 2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1997-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: mem.c,v 1.153.104.6 2010/08/11 23:46:20 tbox Exp $ */
+/* $Id$ */
 
 /*! \file */
 
@@ -1191,7 +1191,7 @@ isc___mem_putanddetach(isc_mem_t **ctxp, void *ptr, size_t size FLARG) {
 				oldsize -= ALIGNMENT_SIZE;
 			INSIST(oldsize == size);
 		}
-		isc_mem_free((isc_mem_t *)ctx, ptr);
+		isc__mem_free((isc_mem_t *)ctx, ptr FLARG_PASS);
 
 		MCTXLOCK(ctx, &ctx->lock);
 		ctx->references--;
@@ -1273,7 +1273,7 @@ isc___mem_get(isc_mem_t *ctx0, size_t size FLARG) {
 	REQUIRE(VALID_CONTEXT(ctx));
 
 	if ((isc_mem_debugging & (ISC_MEM_DEBUGSIZE|ISC_MEM_DEBUGCTX)) != 0)
-		return (isc_mem_allocate((isc_mem_t *)ctx, size));
+		return (isc__mem_allocate(ctx0, size FLARG_PASS));
 
 	if ((ctx->flags & ISC_MEMFLAG_INTERNAL) != 0) {
 		MCTXLOCK(ctx, &ctx->lock);
@@ -1327,7 +1327,7 @@ isc___mem_put(isc_mem_t *ctx0, void *ptr, size_t size FLARG) {
 				oldsize -= ALIGNMENT_SIZE;
 			INSIST(oldsize == size);
 		}
-		isc_mem_free((isc_mem_t *)ctx, ptr);
+		isc__mem_free((isc_mem_t *)ctx, ptr FLARG_PASS);
 		return;
 	}
 
@@ -1592,7 +1592,11 @@ isc___mem_reallocate(isc_mem_t *ctx0, void *ptr, size_t size FLARG) {
 			oldsize = (((size_info *)ptr)[-1]).u.size;
 			INSIST(oldsize >= ALIGNMENT_SIZE);
 			oldsize -= ALIGNMENT_SIZE;
-			copysize = oldsize > size ? size : oldsize;
+			if ((isc_mem_debugging & ISC_MEM_DEBUGCTX) != 0) {
+				INSIST(oldsize >= ALIGNMENT_SIZE);
+				oldsize -= ALIGNMENT_SIZE;
+			}
+			copysize = (oldsize > size) ? size : oldsize;
 			memcpy(new_ptr, ptr, copysize);
 			isc__mem_free(ctx0, ptr FLARG_PASS);
 		}

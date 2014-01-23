@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2002  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,13 +15,17 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: check-tool.c,v 1.39 2009/09/01 00:22:24 jinmei Exp $ */
+/* $Id: check-tool.c,v 1.41 2010/09/07 23:46:59 tbox Exp $ */
 
 /*! \file */
 
 #include <config.h>
 
 #include <stdio.h>
+
+#ifdef _WIN32
+#include <Winsock2.h>
+#endif
 
 #include "check-tool.h"
 #include <isc/buffer.h>
@@ -635,6 +639,9 @@ dump_zone(const char *zonename, dns_zone_t *zone, const char *filename,
 {
 	isc_result_t result;
 	FILE *output = stdout;
+	const char *flags;
+
+	flags = (fileformat == dns_masterformat_text) ? "w+" : "wb+";
 
 	if (debug) {
 		if (filename != NULL && strcmp(filename, "-") != 0)
@@ -645,7 +652,7 @@ dump_zone(const char *zonename, dns_zone_t *zone, const char *filename,
 	}
 
 	if (filename != NULL && strcmp(filename, "-") != 0) {
-		result = isc_stdio_open(filename, "w+", &output);
+		result = isc_stdio_open(filename, flags, &output);
 
 		if (result != ISC_R_SUCCESS) {
 			fprintf(stderr, "could not open output "
@@ -661,3 +668,26 @@ dump_zone(const char *zonename, dns_zone_t *zone, const char *filename,
 
 	return (result);
 }
+
+#ifdef _WIN32
+void
+InitSockets(void) {
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	int err;
+
+	wVersionRequested = MAKEWORD(2, 0);
+
+	err = WSAStartup( wVersionRequested, &wsaData );
+	if (err != 0) {
+		fprintf(stderr, "WSAStartup() failed: %d\n", err);
+		exit(1);
+	}
+}
+
+void
+DestroySockets(void) {
+	WSACleanup();
+}
+#endif
+

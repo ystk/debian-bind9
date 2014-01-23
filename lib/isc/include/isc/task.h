@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2007, 2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2007, 2009-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1998-2001, 2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: task.h,v 1.65 2009/09/02 18:38:40 jinmei Exp $ */
+/* $Id$ */
 
 #ifndef ISC_TASK_H
 #define ISC_TASK_H 1
@@ -106,6 +106,8 @@ typedef struct isc_taskmgrmethods {
 	isc_result_t	(*taskcreate)(isc_taskmgr_t *manager,
 				      unsigned int quantum,
 				      isc_task_t **taskp);
+	void (*setexcltask)(isc_taskmgr_t *mgr, isc_task_t *task);
+	isc_result_t (*excltask)(isc_taskmgr_t *mgr, isc_task_t **taskp);
 } isc_taskmgrmethods_t;
 
 typedef struct isc_taskmethods {
@@ -125,6 +127,8 @@ typedef struct isc_taskmethods {
 	unsigned int (*purgerange)(isc_task_t *task, void *sender,
 				   isc_eventtype_t first, isc_eventtype_t last,
 				   void *tag);
+	isc_result_t (*beginexclusive)(isc_task_t *task);
+	void (*endexclusive)(isc_task_t *task);
 } isc_taskmethods_t;
 
 /*%
@@ -599,6 +603,16 @@ isc_task_getcurrenttime(isc_task_t *task, isc_stdtime_t *t);
  *\li	'*t' has the "current time".
  */
 
+isc_boolean_t
+isc_task_exiting(isc_task_t *t);
+/*%<
+ * Returns ISC_TRUE if the task is in the process of shutting down,
+ * ISC_FALSE otherwise.
+ *
+ * Requires:
+ *\li	'task' is a valid task.
+ */
+
 /*****
  ***** Task Manager.
  *****/
@@ -645,8 +659,10 @@ isc_taskmgr_create(isc_mem_t *mctx, unsigned int workers,
  *
  *\li	#ISC_R_SUCCESS
  *\li	#ISC_R_NOMEMORY
- *\li	#ISC_R_NOTHREADS			No threads could be created.
+ *\li	#ISC_R_NOTHREADS		No threads could be created.
  *\li	#ISC_R_UNEXPECTED		An unexpected error occurred.
+ *\li	#ISC_R_SHUTTINGDOWN      	The non-threaded, shared, task
+ *					manager shutting down.
  */
 
 void
@@ -682,6 +698,31 @@ isc_taskmgr_destroy(isc_taskmgr_t **managerp);
  *\li	All resources used by the task manager, and any tasks it managed,
  *	have been freed.
  */
+
+void
+isc_taskmgr_setexcltask(isc_taskmgr_t *mgr, isc_task_t *task);
+/*%<
+ * Set a task which will be used for all task-exclusive operations.
+ *
+ * Requires:
+ *\li	'manager' is a valid task manager.
+ *
+ *\li	'task' is a valid task.
+ */
+
+isc_result_t
+isc_taskmgr_excltask(isc_taskmgr_t *mgr, isc_task_t **taskp);
+/*%<
+ * Attach '*taskp' to the task set by isc_taskmgr_getexcltask().
+ * This task should be used whenever running in task-exclusive mode,
+ * so as to prevent deadlock between two exclusive tasks.
+ *
+ * Requires:
+ *\li	'manager' is a valid task manager.
+
+ *\li	taskp != NULL && *taskp == NULL
+ */
+
 
 #ifdef HAVE_LIBXML2
 

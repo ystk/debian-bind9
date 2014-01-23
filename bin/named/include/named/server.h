@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: server.h,v 1.104.8.6 2010/08/16 23:46:30 tbox Exp $ */
+/* $Id: server.h,v 1.110 2010/08/16 23:46:52 tbox Exp $ */
 
 #ifndef NAMED_SERVER_H
 #define NAMED_SERVER_H 1
@@ -165,7 +165,12 @@ enum {
 	dns_nsstatscounter_updatefail = 34,
 	dns_nsstatscounter_updatebadprereq = 35,
 
-	dns_nsstatscounter_max = 36
+	dns_nsstatscounter_rpz_rewrites = 36,
+
+	dns_nsstatscounter_ratedropped = 37,
+	dns_nsstatscounter_rateslipped = 38,
+
+	dns_nsstatscounter_max = 39
 };
 
 void

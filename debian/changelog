@@ -1,9 +1,338 @@
-bind9 (1:9.7.2.dfsg.P3-1.1) unstable; urgency=low
+bind9 (1:9.8.4.dfsg.P1-6+nmu2) unstable; urgency=medium
 
   * Non-maintainer upload.
-  * Fix encoding of Danish debconf translation
+  * Install /usr/include/dns/rrl.h (closes: #699834).
 
- -- Christian Perrier <bubulle@debian.org>  Wed, 12 Jan 2011 19:49:15 +0100
+ -- Michael Gilbert <mgilbert@debian.org>  Tue, 16 Apr 2013 01:59:05 +0000
+
+bind9 (1:9.8.4.dfsg.P1-6+nmu1) unstable; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Fix cve-2012-5689: issue in nameservers using DNS64 to perform a AAAA
+    lookup for a record with an A record overwrite rule in a Response Policy
+    Zone (closes: #699145).
+  * Fix cve-2013-2266: issues in regular expression handling (closes: #704174).
+
+ -- Michael Gilbert <mgilbert@debian.org>  Fri, 29 Mar 2013 00:47:25 +0000
+
+bind9 (1:9.8.4.dfsg.P1-6) unstable; urgency=low
+
+  [Ben Hutchings]
+
+  * Initialise OpenSSL before calling chroot().  Closes: #696661
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 01 Mar 2013 08:23:27 -0700
+
+bind9 (1:9.8.4.dfsg.P1-5) unstable; urgency=low
+
+  [LaMont Jones]
+
+  * Properly acknowledge 1:9.8.1.dfsg.P1-4.4: [Philipp Kern]
+    - Fix CVE-2012-4244. Thanks to Moritz Mühlenhoff for providing the patch.
+
+  [Paul Vixie]
+
+  * Include rpz/rrl patches from http://www.redbarn.org/dns/ratelimits. 
+    Closes: #698641
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 30 Jan 2013 14:04:35 -0700
+
+bind9 (1:9.8.4.dfsg.P1-4) unstable; urgency=high
+
+  * The rest of the dnssec validation logspam removal.  Closes: #697681
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 21 Jan 2013 13:18:53 -0700
+
+bind9 (1:9.8.4.dfsg.P1-3) unstable; urgency=low
+
+  [Marc Deslauriers]
+
+  * debian/bind9.apport: Add AppArmor info and logs to apport hook.
+
+  [LaMont Jones]
+
+  * Reduce log level for "sucessfully validated after lower casing" dnssec
+    based on mail from Mark Andrews.  Closes: #697681
+  * remove /var/lib/bind/bind9-default.md5sum in postrm
+  * remove /etc/bind/named.conf.options on purge.  Closes: #668801
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 09 Jan 2013 09:47:24 -0700
+
+bind9 (1:9.8.4.dfsg.P1-2) unstable; urgency=low
+
+  [Michael Gilbert]
+
+  * Use /var/lib/bind for state file.  Closes: #689332
+
+  [LaMont Jones]
+
+  * Re-enable dlopen, do not build the test that fails.  Closes: #692416
+  * Update db.root with new IP for D.root-servers.net.  Closes: #697352
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 07 Jan 2013 06:50:25 -0700
+
+bind9 (1:9.8.4.dfsg.P1-1) unstable; urgency=low
+
+  * Named could die on specific queries with dns64 enabled.
+    [Addressed in change #3388 for BIND 9.8.5 and 9.9.3.]
+    CVE-2012-5688  Closes: #695192
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 05 Dec 2012 05:22:06 -0700
+
+bind9 (1:9.8.4.dfsg-1) unstable; urgency=low
+
+  [Matthew Grant]
+
+  * Turn off dlopen as it was causing test compile failures.
+  * Add missing library .postrm files for debhelper
+
+  [LaMont Jones]
+
+  * New upstream version
+  * soname fixup
+  * Ack NMUs
+
+ -- LaMont Jones <lamont@debian.org>  Mon, 29 Oct 2012 08:37:49 -0600
+
+bind9 (1:9.8.1.dfsg.P1-4.4) testing-proposed-updates; urgency=low
+
+  * Non-maintainer upload.
+  * Fix CVE-2012-4244. Thanks to Moritz Mühlenhoff for providing
+    the patch.
+
+ -- Philipp Kern <pkern@debian.org>  Sat, 03 Nov 2012 20:43:43 +0100
+
+bind9 (1:9.8.1.dfsg.P1-4.3) unstable; urgency=medium
+
+  [ Philipp Kern ]
+  * Non-maintainer upload.
+
+  [ Marc Deslauriers ]
+  * SECURITY UPDATE: denial of service via specific combinations of RDATA
+    - bin/named/query.c: fix logic
+    - Patch backported from 9.8.3-P4
+    - CVE-2012-5166
+
+ -- Philipp Kern <pkern@debian.org>  Sun, 28 Oct 2012 20:28:11 +0100
+
+bind9 (1:9.8.1.dfsg.P1-4.2) unstable; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Fix denial of service vulnerability triggered
+    through an assert because of using bad cache
+    (CVE-2012-3817; Closes: #683259).
+
+ -- Nico Golde <nion@debian.org>  Mon, 30 Jul 2012 20:56:10 +0200
+
+bind9 (1:9.8.1.dfsg.P1-4.1) unstable; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * SECURITY UPDATE: ghost domain names attack
+    - lib/dns/rbtdb.c: Restrict the TTL of NS RRset to no more than that
+      of the old NS RRset when replacing it.
+    - Patch backported from 9.8.2.
+    - CVE-2012-1033
+  * SECURITY UPDATE: denial of service via zero length rdata handling
+    - lib/dns/rdata.c,lib/dns/rdataslab.c: use sentinel pointer for
+      duplicate rdata.
+    - Patch backported from 9.8.3-P1.
+    - CVE-2012-1667
+
+ -- Luk Claes <luk@debian.org>  Wed, 20 Jun 2012 15:26:09 -0400
+
+bind9 (1:9.8.1.dfsg.P1-4) unstable; urgency=low
+
+  [Christoph Egger]
+
+  * define _GNU_SOURCE on kfreebsd et al.  Closes: #658201
+
+  [LaMont Jones]
+
+  * chmod typo in postinst.  LP: #980798
+  * Correctly order debhelper bits in postrm.  Closes: #661040
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 13 Apr 2012 12:09:24 -0600
+
+bind9 (1:9.8.1.dfsg.P1-3) unstable; urgency=low
+
+  [Zlatan Todoric]
+
+  * fixed Serbian latin translation of debconf template.  Closes: #634951
+
+  [Peter Eisentraut]
+
+  * Add support for "status" action to lwresd init script.  Closes: #651540
+
+  [Bjørn Steensrud]
+
+  * NB Translations.  Closes: #654454
+
+  [LaMont Jones]
+
+  * Default to run_resolvconf=false.  LP: #933723
+  * Deliver named.conf.options on fresh install.  Closes: #657042  LP: #920202
+  * Do not deliver /usr/share/bind9/bind9-default.md5sum in the bind9 deb. 
+    Closes: #620007  LP: #681536
+  * Deliver and use /etc/apparmor.d/local/usr.sbin.named for local overrides.
+    LP: #929563
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 17 Feb 2012 14:40:29 -0800
+
+bind9 (1:9.8.1.dfsg.P1-2) unstable; urgency=low
+
+  * Deliver named.conf.options on fresh install.  Closes: #657042  LP: #920202
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 25 Jan 2012 03:55:21 -0700
+
+bind9 (1:9.8.1.dfsg.P1-1) unstable; urgency=low
+
+  [Internet Software Consortium, Inc]
+
+  * 9.8.1-P1
+    -  Cache lookup could return RRSIG data associated with nonexistent
+       records, leading to an assertion failure.
+
+  [LaMont Jones]
+
+  * add a readme entry for DNSSEC-by-default
+  * Failed to install due to chgrp on non-existant directory.  Closes: #647598
+  * ack NMU: l10n issues
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 18 Jan 2012 10:44:14 -0700
+
+bind9 (1:9.8.1.dfsg-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix pending l10n issues. Debconf translations:
+    - Danish (Joe Hansen).  Closes: #619302
+    - Korean (강민지).  Closes: #632006, #632016
+    - Serbian (FULL NAME).  Closes: #634886
+
+ -- Christian Perrier <bubulle@debian.org>  Sat, 03 Dec 2011 17:22:12 +0100
+
+bind9 (1:9.8.1.dfsg-1) unstable; urgency=low
+
+  [Internet Software Consortium, Inc]
+
+  * New upstream release
+
+  [LaMont Jones]
+
+  * cleanup the messages around killing named
+  * enable dnssec validation: deliver named.conf.options outside of
+    conffiledom, and update if able, complain and do not update if not
+    Closes: #516979
+  * typo in min-ncache-ttl processing
+  * disable dlz until we get a patch to make it build again
+
+  [Jay Ford]
+
+  * Fix "waiting for pid $pid to die" loop to not be infinite.  Closes: #570852
+
+ -- LaMont Jones <lamont@debian.org>  Tue, 01 Nov 2011 16:39:19 -0600
+
+bind9 (1:9.8.0.dfsg.P1-0) unstable; urgency=low
+
+  [Internet Software Consortium, Inc]
+
+  * 9.8.0-P1
+
+  [LaMont Jones]
+
+  * soname changes
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 13 May 2011 03:46:22 -0600
+
+bind9 (1:9.7.4.dfsg-0) unstable; urgency=low
+
+  * New upstream
+
+ -- LaMont Jones <lamont@debian.org>  Sun, 21 Aug 2011 04:43:16 -0600
+
+bind9 (1:9.7.3.dfsg-1ubuntu4) oneiric; urgency=low
+
+  * debian/apparmor-profile: Allow /var/run and /run. (LP: #810270)
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 14 Jul 2011 15:15:45 +0200
+
+bind9 (1:9.7.3.dfsg-1ubuntu3) oneiric; urgency=low
+
+  * SECURITY UPDATE: denial of service via specially crafted packet
+    - lib/dns/include/dns/rdataset.h, lib/dns/{masterdump,message,ncache,
+      nsec3,rbtdb,rdataset,resolver,validator}.c: Use an rdataset attribute
+      flag to indicate negative-cache records rather than using rrtype 0.
+    - Patch backported from 9.7.3-P3.
+    - CVE-2011-2464
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 05 Jul 2011 08:33:30 -0400
+
+bind9 (1:9.7.3.dfsg-1ubuntu2.1) natty-security; urgency=low
+
+  * SECURITY UPDATE: denial of service via off-by-one
+    - lib/dns/ncache.c: correctly validate length.
+    - Patch backported from 9.7.3-P1.
+    - CVE-2011-1910
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Fri, 27 May 2011 12:50:40 -0400
+
+bind9 (1:9.7.3.dfsg-1ubuntu2) natty; urgency=low
+
+  * debian/rules, configure, contrib/dlz/config.dlz.in: use
+    DEB_HOST_MULTIARCH so we can find multiarch libraries and fix FTBFS.
+    (LP: #745642)
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 30 Mar 2011 10:19:37 -0400
+
+bind9 (1:9.7.3.dfsg-1ubuntu1) natty; urgency=low
+
+  * debian/bind9-default.md5sum:
+    - updated to reflect the default md5sum in maverick and natty, this
+      avoids a bogus /etc/default/bind9.dpkg-dist file
+      (LP: #556332)
+
+ -- Michael Vogt <michael.vogt@ubuntu.com>  Tue, 29 Mar 2011 10:13:11 +0200
+
+bind9 (1:9.7.3.dfsg-1) unstable; urgency=low
+
+  [Peter Palfrader]
+
+  * Add db-4.6 to bdb_libnames in dlz/config.dlz.in so that it finds the right
+    db.
+
+  [Internet Systems Consortium, Inc]
+
+  * 9.7.3 - Closes: #612287
+
+  [Mahyuddin Susanto]
+
+  * Updated Indonesian debconf templates.  Closes: #608559
+
+  [LaMont Jones]
+
+  * soname changes
+
+ -- LaMont Jones <lamont@debian.org>  Wed, 23 Feb 2011 09:14:36 -0700
+
+bind9 (1:9.7.3.dfsg~rc1-1) unstable; urgency=low
+
+  [Internet Software Consortium, Inc]
+
+  * New upstream
+
+  [Peter Palfrader]
+
+  * Add db-4.6 to bdb_libnames in dlz/config.dlz.in so that it finds the right
+    db.
+
+  [Mahyuddin Susanto]
+
+  * Updated Indonesian debconf templates.  Closes: #608559
+
+  [LaMont Jones]
+
+  * soname changes for new upstream
+
+ -- LaMont Jones <lamont@debian.org>  Fri, 04 Feb 2011 21:20:05 -0700
 
 bind9 (1:9.7.2.dfsg.P3-1) unstable; urgency=high
 

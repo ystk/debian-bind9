@@ -1,5 +1,5 @@
 /*
- * Portions Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Portions Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -29,7 +29,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: dnssec-keygen.c,v 1.108.8.6 2010/08/16 23:46:30 tbox Exp $ */
+/* $Id: dnssec-keygen.c,v 1.115.14.4 2011/11/30 00:51:38 marka Exp $ */
 
 /*! \file */
 
@@ -84,7 +84,8 @@ usage(void) {
 	fprintf(stderr, "    -a <algorithm>:\n");
 	fprintf(stderr, "        RSA | RSAMD5 | DSA | RSASHA1 | NSEC3RSASHA1"
 				" | NSEC3DSA |\n");
-	fprintf(stderr, "        RSASHA256 | RSASHA512 |\n");
+	fprintf(stderr, "        RSASHA256 | RSASHA512 | ECCGOST |\n");
+	fprintf(stderr, "        ECDSAP256SHA256 | ECDSAP384SHA384 |\n");
 	fprintf(stderr, "        DH | HMAC-MD5 | HMAC-SHA1 | HMAC-SHA224 | "
 				"HMAC-SHA256 | \n");
 	fprintf(stderr, "        HMAC-SHA384 | HMAC-SHA512\n");
@@ -101,6 +102,9 @@ usage(void) {
 	fprintf(stderr, "        DSA:\t\t[512..1024] and divisible by 64\n");
 	fprintf(stderr, "        NSEC3DSA:\t[512..1024] and divisible "
 				"by 64\n");
+	fprintf(stderr, "        ECCGOST:\tignored\n");
+	fprintf(stderr, "        ECDSAP256SHA256:\tignored\n");
+	fprintf(stderr, "        ECDSAP384SHA384:\tignored\n");
 	fprintf(stderr, "        HMAC-MD5:\t[1..512]\n");
 	fprintf(stderr, "        HMAC-SHA1:\t[1..160]\n");
 	fprintf(stderr, "        HMAC-SHA224:\t[1..224]\n");
@@ -129,6 +133,7 @@ usage(void) {
 			"records with (default: 0)\n");
 	fprintf(stderr, "    -T <rrtype>: DNSKEY | KEY (default: DNSKEY; "
 			"use KEY for SIG(0))\n");
+	fprintf(stderr, "        ECCGOST:\tignored\n");
 	fprintf(stderr, "    -t <type>: "
 			"AUTHCONF | NOAUTHCONF | NOAUTH | NOCONF "
 			"(default: AUTHCONF)\n");
@@ -195,7 +200,8 @@ progress(int p)
 
 int
 main(int argc, char **argv) {
-	char		*algname = NULL, *nametype = NULL, *type = NULL;
+	char		*algname = NULL, *freeit = NULL;
+	char		*nametype = NULL, *type = NULL;
 	char		*classname = NULL;
 	char		*endp;
 	dst_key_t	*key = NULL;
@@ -507,6 +513,9 @@ main(int argc, char **argv) {
 				algname = strdup(DEFAULT_NSEC3_ALGORITHM);
 			else
 				algname = strdup(DEFAULT_ALGORITHM);
+			if (algname == NULL)
+				fatal("strdup failed");
+			freeit = algname;
 			if (verbose > 0)
 				fprintf(stderr, "no algorithm specified; "
 						"defaulting to %s\n", algname);
@@ -542,7 +551,9 @@ main(int argc, char **argv) {
 
 		if (use_nsec3 &&
 		    alg != DST_ALG_NSEC3DSA && alg != DST_ALG_NSEC3RSASHA1 &&
-		    alg != DST_ALG_RSASHA256 && alg!= DST_ALG_RSASHA512) {
+		    alg != DST_ALG_RSASHA256 && alg!= DST_ALG_RSASHA512 &&
+		    alg != DST_ALG_ECCGOST &&
+		    alg != DST_ALG_ECDSA256 && alg != DST_ALG_ECDSA384) {
 			fatal("%s is incompatible with NSEC3; "
 			      "do not use the -3 option", algname);
 		}
@@ -572,11 +583,12 @@ main(int argc, char **argv) {
 					size = 1024;
 				if (verbose > 0)
 					fprintf(stderr, "key size not "
-							"specified; defaulting "
-							"to %d\n", size);
-			} else {
+							"specified; defaulting"
+							" to %d\n", size);
+			} else if (alg != DST_ALG_ECCGOST &&
+				   alg != DST_ALG_ECDSA256 &&
+				   alg != DST_ALG_ECDSA384)
 				fatal("key size not specified (-b option)");
-			}
 		}
 
 		if (!oldstyle && prepub > 0) {
@@ -703,6 +715,10 @@ main(int argc, char **argv) {
 		if (size != 0 && !dsa_size_ok(size))
 			fatal("invalid DSS key size: %d", size);
 		break;
+	case DST_ALG_ECCGOST:
+	case DST_ALG_ECDSA256:
+	case DST_ALG_ECDSA384:
+		break;
 	case DST_ALG_HMACMD5:
 		options |= DST_TYPE_KEY;
 		if (size < 1 || size > 512)
@@ -767,7 +783,9 @@ main(int argc, char **argv) {
 
 	if (!(alg == DNS_KEYALG_RSAMD5 || alg == DNS_KEYALG_RSASHA1 ||
 	      alg == DNS_KEYALG_NSEC3RSASHA1 || alg == DNS_KEYALG_RSASHA256 ||
-	      alg == DNS_KEYALG_RSASHA512) && rsa_exp != 0)
+	      alg == DNS_KEYALG_RSASHA512 || alg == DST_ALG_ECCGOST ||
+	      alg == DST_ALG_ECDSA256 || alg == DST_ALG_ECDSA384) &&
+	    rsa_exp != 0)
 		fatal("specified RSA exponent for a non-RSA key");
 
 	if (alg != DNS_KEYALG_DH && generator != 0)
@@ -839,6 +857,9 @@ main(int argc, char **argv) {
 
 	case DNS_KEYALG_DSA:
 	case DNS_KEYALG_NSEC3DSA:
+	case DST_ALG_ECCGOST:
+	case DST_ALG_ECDSA256:
+	case DST_ALG_ECDSA384:
 		show_progress = ISC_TRUE;
 		/* fall through */
 
@@ -959,8 +980,7 @@ main(int argc, char **argv) {
 		 * if there is a risk of ID collision due to this key
 		 * or another key being revoked.
 		 */
-		if (key_collision(dst_key_id(key), name, directory,
-				  alg, mctx, NULL)) {
+		if (key_collision(key, name, directory, mctx, NULL)) {
 			conflict = ISC_TRUE;
 			if (null_key) {
 				dst_key_free(&key);
@@ -969,12 +989,15 @@ main(int argc, char **argv) {
 
 			if (verbose > 0) {
 				isc_buffer_clear(&buf);
-				dst_key_buildfilename(key, 0, directory, &buf);
-				fprintf(stderr,
-					"%s: %s already exists, or might "
-					"collide with another key upon "
-					"revokation.  Generating a new key\n",
-					program, filename);
+				ret = dst_key_buildfilename(key, 0,
+							    directory, &buf);
+				if (ret == ISC_R_SUCCESS)
+					fprintf(stderr,
+						"%s: %s already exists, or "
+						"might collide with another "
+						"key upon revokation.  "
+						"Generating a new key\n",
+						program, filename);
 			}
 
 			dst_key_free(&key);
@@ -995,6 +1018,9 @@ main(int argc, char **argv) {
 
 	isc_buffer_clear(&buf);
 	ret = dst_key_buildfilename(key, 0, NULL, &buf);
+	if (ret != ISC_R_SUCCESS)
+		fatal("dst_key_buildfilename returned: %s\n",
+		      isc_result_totext(ret));
 	printf("%s\n", filename);
 	dst_key_free(&key);
 	if (prevkey != NULL)
@@ -1007,6 +1033,9 @@ main(int argc, char **argv) {
 	if (verbose > 10)
 		isc_mem_stats(mctx, stdout);
 	isc_mem_destroy(&mctx);
+
+	if (freeit != NULL)
+		free(freeit);
 
 	return (0);
 }

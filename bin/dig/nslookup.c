@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: nslookup.c,v 1.124 2009/10/20 01:04:03 marka Exp $ */
+/* $Id: nslookup.c,v 1.127.38.2 2011/02/28 01:19:58 tbox Exp $ */
 
 #include <config.h>
 
@@ -57,6 +57,7 @@ static isc_boolean_t in_use = ISC_FALSE;
 static char defclass[MXRD] = "IN";
 static char deftype[MXRD] = "A";
 static isc_event_t *global_event = NULL;
+static int query_error = 1, print_error = 0;
 
 static char domainopt[DNS_NAME_MAXTEXT];
 
@@ -406,6 +407,9 @@ isc_result_t
 printmessage(dig_query_t *query, dns_message_t *msg, isc_boolean_t headers) {
 	char servtext[ISC_SOCKADDR_FORMATSIZE];
 
+	/* I've we've gotten this far, we've reached a server. */
+	query_error = 0;
+
 	debug("printmessage()");
 
 	isc_sockaddr_format(&query->sockaddr, servtext, sizeof(servtext));
@@ -433,6 +437,9 @@ printmessage(dig_query_t *query, dns_message_t *msg, isc_boolean_t headers) {
 		       (msg->rcode != dns_rcode_nxdomain) ? nametext :
 		       query->lookup->textname, rcode_totext(msg->rcode));
 		debug("returning with rcode == 0");
+
+		/* the lookup failed */
+		print_error |= 1;
 		return (ISC_R_SUCCESS);
 	}
 
@@ -536,12 +543,6 @@ testclass(char *typetext) {
 }
 
 static void
-safecpy(char *dest, char *src, int size) {
-	strncpy(dest, src, size);
-	dest[size-1] = 0;
-}
-
-static void
 set_port(const char *value) {
 	isc_uint32_t n;
 	isc_result_t result = parse_uint(&n, value, 65535, "port");
@@ -571,34 +572,34 @@ setoption(char *opt) {
 		show_settings(ISC_TRUE, ISC_FALSE);
 	} else if (strncasecmp(opt, "class=", 6) == 0) {
 		if (testclass(&opt[6]))
-			safecpy(defclass, &opt[6], sizeof(defclass));
+			strlcpy(defclass, &opt[6], sizeof(defclass));
 	} else if (strncasecmp(opt, "cl=", 3) == 0) {
 		if (testclass(&opt[3]))
-			safecpy(defclass, &opt[3], sizeof(defclass));
+			strlcpy(defclass, &opt[3], sizeof(defclass));
 	} else if (strncasecmp(opt, "type=", 5) == 0) {
 		if (testtype(&opt[5]))
-			safecpy(deftype, &opt[5], sizeof(deftype));
+			strlcpy(deftype, &opt[5], sizeof(deftype));
 	} else if (strncasecmp(opt, "ty=", 3) == 0) {
 		if (testtype(&opt[3]))
-			safecpy(deftype, &opt[3], sizeof(deftype));
+			strlcpy(deftype, &opt[3], sizeof(deftype));
 	} else if (strncasecmp(opt, "querytype=", 10) == 0) {
 		if (testtype(&opt[10]))
-			safecpy(deftype, &opt[10], sizeof(deftype));
+			strlcpy(deftype, &opt[10], sizeof(deftype));
 	} else if (strncasecmp(opt, "query=", 6) == 0) {
 		if (testtype(&opt[6]))
-			safecpy(deftype, &opt[6], sizeof(deftype));
+			strlcpy(deftype, &opt[6], sizeof(deftype));
 	} else if (strncasecmp(opt, "qu=", 3) == 0) {
 		if (testtype(&opt[3]))
-			safecpy(deftype, &opt[3], sizeof(deftype));
+			strlcpy(deftype, &opt[3], sizeof(deftype));
 	} else if (strncasecmp(opt, "q=", 2) == 0) {
 		if (testtype(&opt[2]))
-			safecpy(deftype, &opt[2], sizeof(deftype));
+			strlcpy(deftype, &opt[2], sizeof(deftype));
 	} else if (strncasecmp(opt, "domain=", 7) == 0) {
-		safecpy(domainopt, &opt[7], sizeof(domainopt));
+		strlcpy(domainopt, &opt[7], sizeof(domainopt));
 		set_search_domain(domainopt);
 		usesearch = ISC_TRUE;
 	} else if (strncasecmp(opt, "do=", 3) == 0) {
-		safecpy(domainopt, &opt[3], sizeof(domainopt));
+		strlcpy(domainopt, &opt[3], sizeof(domainopt));
 		set_search_domain(domainopt);
 		usesearch = ISC_TRUE;
 	} else if (strncasecmp(opt, "port=", 5) == 0) {
@@ -677,11 +678,11 @@ addlookup(char *opt) {
 	lookup = make_empty_lookup();
 	if (get_reverse(store, sizeof(store), opt, lookup->ip6_int, ISC_TRUE)
 	    == ISC_R_SUCCESS) {
-		safecpy(lookup->textname, store, sizeof(lookup->textname));
+		strlcpy(lookup->textname, store, sizeof(lookup->textname));
 		lookup->rdtype = dns_rdatatype_ptr;
 		lookup->rdtypeset = ISC_TRUE;
 	} else {
-		safecpy(lookup->textname, opt, sizeof(lookup->textname));
+		strlcpy(lookup->textname, opt, sizeof(lookup->textname));
 		lookup->rdtype = rdtype;
 		lookup->rdtypeset = ISC_TRUE;
 	}
@@ -893,5 +894,5 @@ main(int argc, char **argv) {
 	destroy_libs();
 	isc_app_finish();
 
-	return (0);
+	return (query_error | print_error);
 }

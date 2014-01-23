@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2002, 2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: namedconf.c,v 1.113.4.10 2010/08/11 18:19:58 each Exp $ */
+/* $Id$ */
 
 /*! \file */
 
@@ -313,7 +313,7 @@ doc_matchname(cfg_printer_t *pctx, const cfg_type_t *type) {
 static const char *matchtype_enums[] = {
 	"name", "subdomain", "wildcard", "self", "selfsub", "selfwild",
 	"krb5-self", "ms-self", "krb5-subdomain", "ms-subdomain",
-	"tcp-self", "6to4-self", "zonesub", NULL };
+	"tcp-self", "6to4-self", "zonesub", "external", NULL };
 
 static cfg_type_t cfg_type_matchtype = {
 	"matchtype", parse_matchtype, cfg_print_ustring,
@@ -542,8 +542,7 @@ static cfg_type_t cfg_type_bracketed_sockaddrlist = {
 	&cfg_rep_list, &cfg_type_sockaddr
 };
 
-static const char *autodnssec_enums[] = { "allow", "maintain", "create",
-					  "off", NULL };
+static const char *autodnssec_enums[] = { "allow", "maintain", "off", NULL };
 static cfg_type_t cfg_type_autodnssec = {
 	"autodnssec", cfg_parse_enum, cfg_print_ustring, cfg_doc_enum,
 	&cfg_rep_string, &autodnssec_enums
@@ -593,7 +592,8 @@ static cfg_type_t cfg_type_forwardtype = {
 };
 
 static const char *zonetype_enums[] = {
-	"master", "slave", "stub", "hint", "forward", "delegation-only", NULL };
+	"master", "slave", "stub", "static-stub", "hint", "forward",
+	"delegation-only", NULL };
 static cfg_type_t cfg_type_zonetype = {
 	"zonetype", cfg_parse_enum, cfg_print_ustring, cfg_doc_enum,
 	&cfg_rep_string, &zonetype_enums
@@ -658,9 +658,59 @@ static cfg_type_t cfg_type_qstringornone = {
 };
 
 /*%
+ * A boolean ("yes" or "no"), or the special keyword "auto".
+ * Used in the dnssec-validation option.
+ */
+static void
+print_auto(cfg_printer_t *pctx, const cfg_obj_t *obj) {
+	UNUSED(obj);
+	cfg_print_cstr(pctx, "auto");
+}
+
+static cfg_type_t cfg_type_auto = {
+	"auto", NULL, print_auto, NULL, &cfg_rep_void, NULL
+};
+
+static isc_result_t
+parse_boolorauto(cfg_parser_t *pctx, const cfg_type_t *type,
+		    cfg_obj_t **ret)
+{
+	isc_result_t result;
+
+	CHECK(cfg_gettoken(pctx, CFG_LEXOPT_QSTRING));
+	if (pctx->token.type == isc_tokentype_string &&
+	    strcasecmp(TOKEN_STRING(pctx), "auto") == 0)
+		return (cfg_create_obj(pctx, &cfg_type_auto, ret));
+	cfg_ungettoken(pctx);
+	return (cfg_parse_boolean(pctx, type, ret));
+ cleanup:
+	return (result);
+}
+
+static void
+print_boolorauto(cfg_printer_t *pctx, const cfg_obj_t *obj) {
+	if (obj->type->rep == &cfg_rep_void)
+		cfg_print_chars(pctx, "auto", 4);
+	else if (obj->value.boolean)
+		cfg_print_chars(pctx, "yes", 3);
+	else
+		cfg_print_chars(pctx, "no", 2);
+}
+
+static void
+doc_boolorauto(cfg_printer_t *pctx, const cfg_type_t *type) {
+	UNUSED(type);
+	cfg_print_cstr(pctx, "( yes | no | auto )");
+}
+
+static cfg_type_t cfg_type_boolorauto = {
+	"boolorauto", parse_boolorauto, print_boolorauto,
+	doc_boolorauto, NULL, NULL
+};
+
+/*%
  * keyword hostname
  */
-
 static void
 print_hostname(cfg_printer_t *pctx, const cfg_obj_t *obj) {
 	UNUSED(obj);
@@ -878,6 +928,7 @@ options_clauses[] = {
 	{ "tcp-listen-queue", &cfg_type_uint32, 0 },
 	{ "tkey-dhkey", &cfg_type_tkey_dhkey, 0 },
 	{ "tkey-gssapi-credential", &cfg_type_qstring, 0 },
+	{ "tkey-gssapi-keytab", &cfg_type_qstring, 0 },
 	{ "tkey-domain", &cfg_type_qstring, 0 },
 	{ "transfers-per-ns", &cfg_type_uint32, 0 },
 	{ "transfers-in", &cfg_type_uint32, 0 },
@@ -890,7 +941,6 @@ options_clauses[] = {
 	{ "version", &cfg_type_qstringornone, 0 },
 	{ NULL, NULL, 0 }
 };
-
 
 static cfg_type_t cfg_type_namelist = {
 	"namelist", cfg_parse_bracketed_list, cfg_print_bracketed_list,
@@ -962,9 +1012,280 @@ static cfg_type_t cfg_type_masterformat = {
 	&cfg_rep_string, &masterformat_enums
 };
 
+
+
+/*%
+ *  response-policy {
+ *	zone <string> [ policy (given|disabled|passthru|
+ *					nxdomain|nodata|cname <domain> ) ]
+ *		      [ recursive-only yes|no ] [ max-policy-ttl number ] ;
+ *  } [ recursive-only yes|no ] [ max-policy-ttl number ] ;
+ *	 [ break-dnssec yes|no ] [ min-ns-dots number ] ;
+ */
+
+static void
+doc_rpz_policy(cfg_printer_t *pctx, const cfg_type_t *type) {
+	const char * const *p;
+	/*
+	 * This is cfg_doc_enum() without the trailing " )".
+	 */
+	cfg_print_chars(pctx, "( ", 2);
+	for (p = type->of; *p != NULL; p++) {
+		cfg_print_cstr(pctx, *p);
+		if (p[1] != NULL)
+			cfg_print_chars(pctx, " | ", 3);
+	}
+}
+
+static void
+doc_rpz_cname(cfg_printer_t *pctx, const cfg_type_t *type) {
+	cfg_doc_terminal(pctx, type);
+	cfg_print_chars(pctx, " )", 2);
+}
+
+/*
+ * Parse
+ *	given|disabled|passthru|nxdomain|nodata|cname <domain>
+ */
+static isc_result_t
+cfg_parse_rpz_policy(cfg_parser_t *pctx, const cfg_type_t *type,
+		     cfg_obj_t **ret)
+{
+	isc_result_t result;
+	cfg_obj_t *obj;
+	const cfg_tuplefielddef_t *fields;
+
+	CHECK(cfg_create_tuple(pctx, type, &obj));
+
+	fields = type->of;
+	CHECK(cfg_parse_obj(pctx, fields[0].type, &obj->value.tuple[0]));
+	/*
+	 * parse cname domain only after "policy cname"
+	 */
+	if (strcasecmp("cname", cfg_obj_asstring(obj->value.tuple[0])) != 0) {
+		CHECK(cfg_parse_void(pctx, NULL, &obj->value.tuple[1]));
+	} else {
+		CHECK(cfg_parse_obj(pctx, fields[1].type,
+				    &obj->value.tuple[1]));
+	}
+
+	*ret = obj;
+	return (ISC_R_SUCCESS);
+
+cleanup:
+	CLEANUP_OBJ(obj);
+	return (result);
+}
+
+/*
+ * Parse a tuple consisting of any kind of  required field followed
+ * by 2 or more optional keyvalues that can be in any order.
+ */
+static isc_result_t
+cfg_parse_kv_tuple(cfg_parser_t *pctx, const cfg_type_t *type, cfg_obj_t **ret) {
+	const cfg_tuplefielddef_t *fields, *f;
+	cfg_obj_t *obj;
+	int fn;
+	isc_result_t result;
+
+	obj = NULL;
+	CHECK(cfg_create_tuple(pctx, type, &obj));
+
+	/*
+	 * The zone first field is required and always first.
+	 */
+	fields = type->of;
+	CHECK(cfg_parse_obj(pctx, fields[0].type, &obj->value.tuple[0]));
+
+	for (;;) {
+		CHECK(cfg_peektoken(pctx, CFG_LEXOPT_QSTRING));
+		if (pctx->token.type != isc_tokentype_string)
+			break;
+
+		for (fn = 1, f = &fields[1]; ; ++fn, ++f) {
+			if (f->name == NULL) {
+				cfg_parser_error(pctx, 0, "unexpected '%s'",
+						 TOKEN_STRING(pctx));
+				result = ISC_R_UNEXPECTEDTOKEN;
+				goto cleanup;
+			}
+			if (obj->value.tuple[fn] == NULL &&
+			    strcasecmp(f->name, TOKEN_STRING(pctx)) == 0)
+				break;
+		}
+
+		CHECK(cfg_gettoken(pctx, 0));
+		CHECK(cfg_parse_obj(pctx, f->type, &obj->value.tuple[fn]));
+	}
+
+	for (fn = 1, f = &fields[1]; f->name != NULL; ++fn, ++f) {
+		if (obj->value.tuple[fn] == NULL)
+			CHECK(cfg_parse_void(pctx, NULL,
+					     &obj->value.tuple[fn]));
+	}
+
+	*ret = obj;
+	return (ISC_R_SUCCESS);
+
+cleanup:
+	CLEANUP_OBJ(obj);
+	return (result);
+}
+
+static void
+cfg_print_kv_tuple(cfg_printer_t *pctx, const cfg_obj_t *obj) {
+	unsigned int i;
+	const cfg_tuplefielddef_t *fields, *f;
+	const cfg_obj_t *fieldobj;
+
+	fields = obj->type->of;
+	for (f = fields, i = 0; f->name != NULL; f++, i++) {
+		fieldobj = obj->value.tuple[i];
+		if (fieldobj->type->print == cfg_print_void)
+			continue;
+		if (i != 0) {
+			cfg_print_chars(pctx, " ", 1);
+			cfg_print_cstr(pctx, f->name);
+			cfg_print_chars(pctx, " ", 1);
+		}
+		cfg_print_obj(pctx, fieldobj);
+	}
+}
+
+static void
+cfg_doc_kv_tuple(cfg_printer_t *pctx, const cfg_type_t *type) {
+	const cfg_tuplefielddef_t *fields, *f;
+
+	fields = type->of;
+	for (f = fields; f->name != NULL; f++) {
+		if (f != fields) {
+			cfg_print_chars(pctx, " [ ", 3);
+			cfg_print_cstr(pctx, f->name);
+			if (f->type->doc != cfg_doc_void)
+				cfg_print_chars(pctx, " ", 1);
+		}
+		cfg_doc_obj(pctx, f->type);
+		if (f != fields)
+			cfg_print_chars(pctx, " ]", 2);
+	}
+}
+
+static keyword_type_t zone_kw = {"zone", &cfg_type_qstring};
+static cfg_type_t cfg_type_rpz_zone = {
+	"zone", parse_keyvalue, print_keyvalue,
+	doc_keyvalue, &cfg_rep_string,
+	&zone_kw
+};
+static const char *rpz_policies[] = {
+	"given", "disabled", "passthru", "no-op", "nxdomain", "nodata",
+	"cname", NULL
+};
+static cfg_type_t cfg_type_rpz_policy_name = {
+	"policy name", cfg_parse_enum, cfg_print_ustring,
+	doc_rpz_policy, &cfg_rep_string,
+	&rpz_policies
+};
+static cfg_type_t cfg_type_rpz_cname = {
+	"quoted_string", cfg_parse_astring, NULL,
+	doc_rpz_cname, &cfg_rep_string,
+	NULL
+};
+static cfg_tuplefielddef_t rpz_policy_fields[] = {
+	{ "policy name", &cfg_type_rpz_policy_name, 0 },
+	{ "cname", &cfg_type_rpz_cname, 0 },
+	{ NULL, NULL, 0 }
+};
+static cfg_type_t cfg_type_rpz_policy = {
+	"policy tuple", cfg_parse_rpz_policy,
+	cfg_print_tuple, cfg_doc_tuple, &cfg_rep_tuple,
+	rpz_policy_fields
+};
+static cfg_tuplefielddef_t rpz_zone_fields[] = {
+	{ "zone name", &cfg_type_rpz_zone, 0 },
+	{ "policy", &cfg_type_rpz_policy, 0 },
+	{ "recursive-only", &cfg_type_boolean, 0 },
+	{ "max-policy-ttl", &cfg_type_uint32, 0 },
+	{ NULL, NULL, 0 }
+};
+static cfg_type_t cfg_type_rpz_tuple = {
+	"rpz tuple", cfg_parse_kv_tuple,
+	cfg_print_kv_tuple, cfg_doc_kv_tuple, &cfg_rep_tuple,
+	rpz_zone_fields
+};
+static cfg_type_t cfg_type_rpz_list = {
+	"zone list", cfg_parse_bracketed_list, cfg_print_bracketed_list,
+	cfg_doc_bracketed_list, &cfg_rep_list,
+	&cfg_type_rpz_tuple
+};
+static cfg_tuplefielddef_t rpz_fields[] = {
+	{ "zone list", &cfg_type_rpz_list, 0 },
+	{ "recursive-only", &cfg_type_boolean, 0 },
+	{ "break-dnssec", &cfg_type_boolean, 0 },
+	{ "max-policy-ttl", &cfg_type_uint32, 0 },
+	{ "min-ns-dots", &cfg_type_uint32, 0 },
+	{ NULL, NULL, 0 }
+};
+static cfg_type_t cfg_type_rpz = {
+	"rpz", cfg_parse_kv_tuple,
+	cfg_print_kv_tuple, cfg_doc_kv_tuple, &cfg_rep_tuple,
+	rpz_fields
+};
+
+
+/*
+ * rate-limit
+ */
+static cfg_clausedef_t rrl_clauses[] = {
+	{ "responses-per-second", &cfg_type_uint32, 0 },
+	{ "errors-per-second", &cfg_type_uint32, 0 },
+	{ "nxdomains-per-second", &cfg_type_uint32, 0 },
+	{ "responses-per-second", &cfg_type_uint32, 0 },
+	{ "all-per-second", &cfg_type_uint32, 0 },
+	{ "slip", &cfg_type_uint32, 0 },
+	{ "window", &cfg_type_uint32, 0 },
+	{ "log-only", &cfg_type_boolean, 0 },
+	{ "qps-scale", &cfg_type_uint32, 0 },
+	{ "IPv4-prefix-length", &cfg_type_uint32, 0 },
+	{ "IPv6-prefix-length", &cfg_type_uint32, 0 },
+	{ "exempt-clients", &cfg_type_bracketed_aml, 0 },
+	{ "max-table-size", &cfg_type_uint32, 0 },
+	{ "min-table-size", &cfg_type_uint32, 0 },
+	{ NULL, NULL, 0 }
+};
+
+static cfg_clausedef_t *rrl_clausesets[] = {
+	rrl_clauses,
+	NULL
+};
+
+static cfg_type_t cfg_type_rrl = {
+	"rate-limit", cfg_parse_map, cfg_print_map, cfg_doc_map,
+	&cfg_rep_map, rrl_clausesets
+};
+
+
+
 /*%
  * dnssec-lookaside
  */
+
+static void
+print_lookaside(cfg_printer_t *pctx, const cfg_obj_t *obj)
+{
+	const cfg_obj_t *domain = obj->value.tuple[0];
+
+	if (domain->value.string.length == 4 &&
+	    strncmp(domain->value.string.base, "auto", 4) == 0)
+		cfg_print_cstr(pctx, "auto");
+	else
+		cfg_print_tuple(pctx, obj);
+}
+
+static void
+doc_lookaside(cfg_printer_t *pctx, const cfg_type_t *type) {
+	UNUSED(type);
+	cfg_print_cstr(pctx, "( <string> trust-anchor <string> | auto | no )");
+}
 
 static keyword_type_t trustanchor_kw = { "trust-anchor", &cfg_type_astring };
 
@@ -980,8 +1301,33 @@ static cfg_tuplefielddef_t lookaside_fields[] = {
 };
 
 static cfg_type_t cfg_type_lookaside = {
-	"lookaside", cfg_parse_tuple, cfg_print_tuple, cfg_doc_tuple,
+	"lookaside", cfg_parse_tuple, print_lookaside, doc_lookaside,
 	&cfg_rep_tuple, lookaside_fields
+};
+
+/*
+ * DNS64.
+ */
+static cfg_clausedef_t
+dns64_clauses[] = {
+	{ "clients", &cfg_type_bracketed_aml, 0 },
+	{ "mapped", &cfg_type_bracketed_aml, 0 },
+	{ "exclude", &cfg_type_bracketed_aml, 0 },
+	{ "suffix", &cfg_type_netaddr6, 0 },
+	{ "recursive-only", &cfg_type_boolean, 0 },
+	{ "break-dnssec", &cfg_type_boolean, 0 },
+	{ NULL, NULL, 0 },
+};
+
+static cfg_clausedef_t *
+dns64_clausesets[] = {
+	dns64_clauses,
+	NULL
+};
+
+static cfg_type_t cfg_type_dns64 = {
+	"dns64", cfg_parse_netprefix_map, cfg_print_map, cfg_doc_map,
+	&cfg_rep_map, dns64_clausesets
 };
 
 /*%
@@ -1013,12 +1359,15 @@ view_clauses[] = {
 	{ "disable-algorithms", &cfg_type_disablealgorithm,
 	  CFG_CLAUSEFLAG_MULTI },
 	{ "disable-empty-zone", &cfg_type_astring, CFG_CLAUSEFLAG_MULTI },
+	{ "dns64", &cfg_type_dns64, CFG_CLAUSEFLAG_MULTI },
+	{ "dns64-server", &cfg_type_astring, 0 },
+	{ "dns64-contact", &cfg_type_astring, 0 },
 	{ "dnssec-accept-expired", &cfg_type_boolean, 0 },
 	{ "dnssec-enable", &cfg_type_boolean, 0 },
 	{ "dnssec-lookaside", &cfg_type_lookaside, CFG_CLAUSEFLAG_MULTI },
 	{ "dnssec-must-be-secure",  &cfg_type_mustbesecure,
 	  CFG_CLAUSEFLAG_MULTI },
-	{ "dnssec-validation", &cfg_type_boolean, 0 },
+	{ "dnssec-validation", &cfg_type_boolorauto, 0 },
 	{ "dual-stack-servers", &cfg_type_nameportiplist, 0 },
 	{ "edns-udp-size", &cfg_type_uint32, 0 },
 	{ "empty-contact", &cfg_type_astring, 0 },
@@ -1051,6 +1400,7 @@ view_clauses[] = {
 	{ "recursion", &cfg_type_boolean, 0 },
 	{ "request-ixfr", &cfg_type_boolean, 0 },
 	{ "request-nsid", &cfg_type_boolean, 0 },
+	{ "resolver-query-timeout", &cfg_type_uint32, 0 },
 	{ "rfc2308-type1", &cfg_type_boolean, CFG_CLAUSEFLAG_NYI },
 	{ "root-delegation-only",  &cfg_type_optional_exclude, 0 },
 	{ "rrset-order", &cfg_type_rrsetorder, 0 },
@@ -1069,6 +1419,8 @@ view_clauses[] = {
 	{ "filter-aaaa-on-v4", &cfg_type_v4_aaaa,
 	   CFG_CLAUSEFLAG_NOTCONFIGURED },
 #endif
+	{ "response-policy", &cfg_type_rpz, 0 },
+	{ "rate-limit", &cfg_type_rrl, 0 },
 	{ NULL, NULL, 0 }
 };
 
@@ -1139,6 +1491,7 @@ zone_clauses[] = {
 	{ "also-notify", &cfg_type_portiplist, 0 },
 	{ "alt-transfer-source", &cfg_type_sockaddr4wild, 0 },
 	{ "alt-transfer-source-v6", &cfg_type_sockaddr6wild, 0 },
+	{ "auto-dnssec", &cfg_type_autodnssec, 0 },
 	{ "check-dup-records", &cfg_type_checkmode, 0 },
 	{ "check-integrity", &cfg_type_boolean, 0 },
 	{ "check-mx", &cfg_type_checkmode, 0 },
@@ -1208,7 +1561,8 @@ zone_only_clauses[] = {
 	 */
 	{ "check-names", &cfg_type_checkmode, 0 },
 	{ "ixfr-from-differences", &cfg_type_boolean, 0 },
-	{ "auto-dnssec", &cfg_type_autodnssec, 0 },
+	{ "server-addresses", &cfg_type_bracketed_sockaddrlist, 0 },
+	{ "server-names", &cfg_type_namelist, 0 },
 	{ NULL, NULL, 0 }
 };
 
@@ -2040,7 +2394,8 @@ static cfg_type_t cfg_type_controls_sockaddr = {
  * statement, which takes a single key with or without braces and semicolon.
  */
 static isc_result_t
-parse_server_key_kludge(cfg_parser_t *pctx, const cfg_type_t *type, cfg_obj_t **ret)
+parse_server_key_kludge(cfg_parser_t *pctx, const cfg_type_t *type,
+			cfg_obj_t **ret)
 {
 	isc_result_t result;
 	isc_boolean_t braces = ISC_FALSE;
@@ -2050,7 +2405,7 @@ parse_server_key_kludge(cfg_parser_t *pctx, const cfg_type_t *type, cfg_obj_t **
 	CHECK(cfg_peektoken(pctx, 0));
 	if (pctx->token.type == isc_tokentype_special &&
 	    pctx->token.value.as_char == '{') {
-		result = cfg_gettoken(pctx, 0);
+		CHECK(cfg_gettoken(pctx, 0));
 		braces = ISC_TRUE;
 	}
 

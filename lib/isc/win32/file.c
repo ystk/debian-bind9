@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2007, 2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004, 2007, 2009, 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2002  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: file.c,v 1.35 2009/09/02 17:58:06 each Exp $ */
+/* $Id$ */
 
 #include <config.h>
 
@@ -45,10 +45,14 @@
  *
  */
 static int
-gettemp(char *path, int *doopen) {
+gettemp(char *path, isc_boolean_t binary, int *doopen) {
 	char *start, *trv;
 	struct stat sbuf;
 	int pid;
+	int flags = O_CREAT|O_EXCL|O_RDWR;
+
+	if (binary)
+		flags |= _O_BINARY;
 
 	trv = strrchr(path, 'X');
 	trv++;
@@ -81,8 +85,7 @@ gettemp(char *path, int *doopen) {
 	for (;;) {
 		if (doopen) {
 			if ((*doopen =
-			    open(path, O_CREAT|O_EXCL|O_RDWR,
-				 _S_IREAD | _S_IWRITE)) >= 0)
+			    open(path, flags, _S_IREAD | _S_IWRITE)) >= 0)
 				return (1);
 			if (errno != EEXIST)
 				return (0);
@@ -108,10 +111,10 @@ gettemp(char *path, int *doopen) {
 }
 
 static int
-mkstemp(char *path) {
+mkstemp(char *path, isc_boolean_t binary) {
 	int fd;
 
-	return (gettemp(path, &fd) ? fd : -1);
+	return (gettemp(path, binary, &fd) ? fd : -1);
 }
 
 /*
@@ -165,7 +168,7 @@ isc_file_safemovefile(const char *oldname, const char *newname) {
 		exists = TRUE;
 		strcpy(buf, newname);
 		strcat(buf, ".XXXXX");
-		tmpfd = mkstemp(buf);
+		tmpfd = mkstemp(buf, ISC_TRUE);
 		if (tmpfd > 0)
 			_close(tmpfd);
 		DeleteFile(buf);
@@ -300,7 +303,7 @@ isc_file_renameunique(const char *file, char *templet) {
 	REQUIRE(file != NULL);
 	REQUIRE(templet != NULL);
 
-	fd = mkstemp(templet);
+	fd = mkstemp(templet, ISC_TRUE);
 	if (fd == -1)
 		result = isc__errno2result(errno);
 	else
@@ -316,8 +319,8 @@ isc_file_renameunique(const char *file, char *templet) {
 	return (result);
 }
 
-isc_result_t
-isc_file_openunique(char *templet, FILE **fp) {
+static isc_result_t
+openuniquemode(char *templet, int mode, isc_boolean_t binary, FILE **fp) {
 	int fd;
 	FILE *f;
 	isc_result_t result = ISC_R_SUCCESS;
@@ -328,12 +331,17 @@ isc_file_openunique(char *templet, FILE **fp) {
 	/*
 	 * Win32 does not have mkstemp. Using emulation above.
 	 */
-	fd = mkstemp(templet);
+	fd = mkstemp(templet, binary);
 
 	if (fd == -1)
 		result = isc__errno2result(errno);
 	if (result == ISC_R_SUCCESS) {
-		f = fdopen(fd, "w+");
+#if 1
+		UNUSED(mode);
+#else
+		(void)fchmod(fd, mode);
+#endif
+		f = fdopen(fd, binary ? "wb+" : "w+");
 		if (f == NULL) {
 			result = isc__errno2result(errno);
 			(void)remove(templet);
@@ -343,6 +351,40 @@ isc_file_openunique(char *templet, FILE **fp) {
 	}
 
 	return (result);
+}
+
+isc_result_t
+isc_file_openuniqueprivate(char *templet, FILE **fp) {
+	int mode = _S_IREAD | _S_IWRITE;
+	return (openuniquemode(templet, mode, ISC_FALSE, fp));
+}
+
+isc_result_t
+isc_file_openunique(char *templet, FILE **fp) {
+	int mode = _S_IREAD | _S_IWRITE;
+	return (openuniquemode(templet, mode, ISC_FALSE, fp));
+}
+
+isc_result_t
+isc_file_openuniquemode(char *templet, int mode, FILE **fp) {
+	return (openuniquemode(templet, mode, ISC_FALSE, fp));
+}
+
+isc_result_t
+isc_file_bopenuniqueprivate(char *templet, FILE **fp) {
+	int mode = _S_IREAD | _S_IWRITE;
+	return (openuniquemode(templet, mode, ISC_TRUE, fp));
+}
+
+isc_result_t
+isc_file_bopenunique(char *templet, FILE **fp) {
+	int mode = _S_IREAD | _S_IWRITE;
+	return (openuniquemode(templet, mode, ISC_TRUE, fp));
+}
+
+isc_result_t
+isc_file_bopenuniquemode(char *templet, int mode, FILE **fp) {
+	return (openuniquemode(templet, mode, ISC_TRUE, fp));
 }
 
 isc_result_t
@@ -379,6 +421,23 @@ isc_file_exists(const char *pathname) {
 	REQUIRE(pathname != NULL);
 
 	return (ISC_TF(file_stats(pathname, &stats) == ISC_R_SUCCESS));
+}
+
+isc_result_t
+isc_file_isplainfile(const char *filename) {
+	/*
+	 * This function returns success if filename is a plain file.
+	 */
+	struct stat filestat;
+	memset(&filestat,0,sizeof(struct stat));
+
+	if ((stat(filename, &filestat)) == -1)
+		return(isc__errno2result(errno));
+
+	if(! S_ISREG(filestat.st_mode))
+		return(ISC_R_INVALIDFILE);
+
+	return(ISC_R_SUCCESS);
 }
 
 isc_boolean_t
@@ -582,4 +641,17 @@ isc_file_splitpath(isc_mem_t *mctx, char *path, char **dirname, char **basename)
 	*basename = file;
 
 	return (ISC_R_SUCCESS);
+}
+
+isc_result_t
+isc_file_mode(const char *file, mode_t *modep) {
+	isc_result_t result;
+	struct stat stats;
+
+	REQUIRE(modep != NULL);
+
+	result = file_stats(file, &stats);
+	if (result == ISC_R_SUCCESS)
+		*modep = (stats.st_mode & 07777);
+	return (result);
 }

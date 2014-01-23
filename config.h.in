@@ -1,6 +1,6 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
 /*
- * Copyright (C) 2004, 2005, 2007, 2008  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004, 2005, 2007, 2008, 2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -138,6 +138,9 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define if OpenSSL includes DSA support */
 #undef HAVE_OPENSSL_DSA
 
+/* Define if OpenSSL includes ECDSA support */
+#undef HAVE_OPENSSL_ECDSA
+
 /* Define to the length type used by the socket API (socklen_t, size_t, int). */
 #undef ISC_SOCKADDR_LEN_T
 
@@ -150,6 +153,9 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to enable the "filter-aaaa-on-v4" option. */
 #undef ALLOW_FILTER_AAAA_ON_V4
 
+/* define if ATF unit tests are to be built. */
+#undef ATF_TEST
+
 /* Define if recvmsg() does not meet all of the BSD socket API specifications.
    */
 #undef BROKEN_RECVMSG
@@ -159,6 +165,12 @@ int sigwait(const unsigned int *set, int *sig);
 
 /* Define to enable "rrset-order fixed" syntax. */
 #undef DNS_RDATASET_FIXED
+
+/* Define to enable rpz-nsdname rules. */
+#undef ENABLE_RPZ_NSDNAME
+
+/* Define to enable rpz-nsip rules. */
+#undef ENABLE_RPZ_NSIP
 
 /* Solaris hack to get select_large_fdset. */
 #undef FD_SETSIZE
@@ -178,11 +190,26 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to 1 if you have the `chroot' function. */
 #undef HAVE_CHROOT
 
+/* Define to 1 if you have the <devpoll.h> header file. */
+#undef HAVE_DEVPOLL_H
+
+/* Define to 1 if you have the `dlclose' function. */
+#undef HAVE_DLCLOSE
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Define to 1 if you have the `dlopen' function. */
+#undef HAVE_DLOPEN
+
+/* Define to 1 if you have the `dlsym' function. */
+#undef HAVE_DLSYM
+
 /* Define to 1 if you have the `EVP_sha256' function. */
 #undef HAVE_EVP_SHA256
+
+/* Define to 1 if you have the `EVP_sha384' function. */
+#undef HAVE_EVP_SHA384
 
 /* Define to 1 if you have the `EVP_sha512' function. */
 #undef HAVE_EVP_SHA512
@@ -193,8 +220,14 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to 1 if you have the <gssapi/gssapi.h> header file. */
 #undef HAVE_GSSAPI_GSSAPI_H
 
+/* Define to 1 if you have the <gssapi/gssapi_krb5.h> header file. */
+#undef HAVE_GSSAPI_GSSAPI_KRB5_H
+
 /* Define to 1 if you have the <gssapi.h> header file. */
 #undef HAVE_GSSAPI_H
+
+/* Define to 1 if you have the <gssapi_krb5.h> header file. */
+#undef HAVE_GSSAPI_KRB5_H
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -253,8 +286,8 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to 1 if you have the <net/if6.h> header file. */
 #undef HAVE_NET_IF6_H
 
-/* Define to 1 if you have the <regex.h> header file. */
-#undef HAVE_REGEX_H
+/* Define if your OpenSSL version supports GOST. */
+#undef HAVE_OPENSSL_GOST
 
 /* Define to 1 if you have the `setegid' function. */
 #undef HAVE_SETEGID
@@ -334,6 +367,9 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to the flags type used by getnameinfo(3). */
 #undef IRS_GETNAMEINFO_FLAGS_T
 
+/* Define to allow building of objects for dlopen(). */
+#undef ISC_DLZ_DLOPEN
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
@@ -367,6 +403,9 @@ int sigwait(const unsigned int *set, int *sig);
    (O_NDELAY/O_NONBLOCK). */
 #undef PORT_NONBLOCK
 
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
@@ -398,11 +437,8 @@ int sigwait(const unsigned int *set, int *sig);
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
-/* Define to `__inline__' or `__inline' if that's what the C compiler
-   calls it, or to nothing if 'inline' is not supported under any name.  */
-#ifndef __cplusplus
+/* Define to empty if your compiler does not support "static inline". */
 #undef inline
-#endif
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

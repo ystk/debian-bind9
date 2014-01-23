@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: zone.h,v 1.174.4.4 2010/08/16 22:27:18 marka Exp $ */
+/* $Id$ */
 
 #ifndef DNS_ZONE_H
 #define DNS_ZONE_H 1
@@ -34,6 +34,7 @@
 
 #include <dns/masterdump.h>
 #include <dns/rdatastruct.h>
+#include <dns/rpz.h>
 #include <dns/types.h>
 
 typedef enum {
@@ -41,7 +42,9 @@ typedef enum {
 	dns_zone_master,
 	dns_zone_slave,
 	dns_zone_stub,
-	dns_zone_key
+	dns_zone_staticstub,
+	dns_zone_key,
+	dns_zone_dlz
 } dns_zonetype_t;
 
 #define DNS_ZONEOPT_SERVERS	  0x00000001U	/*%< perform server checks */
@@ -378,6 +381,22 @@ dns_zone_getdb(dns_zone_t *zone, dns_db_t **dbp);
  * Returns:
  *\li	#ISC_R_SUCCESS
  *\li	DNS_R_NOTLOADED
+ */
+
+void
+dns_zone_setdb(dns_zone_t *zone, dns_db_t *db);
+/*%<
+ *	Sets the zone database to 'db'.
+ *
+ *	This function is expected to be used to configure a zone with a
+ *	database which is not loaded from a file or zone transfer.
+ *	It can be used for a general purpose zone, but right now its use
+ *	is limited to static-stub zones to avoid possible undiscovered
+ *	problems in the general cases.
+ *
+ * Require:
+ *\li	'zone' to be a valid zone of static-stub.
+ *\li	zone doesn't have a database.
  */
 
 isc_result_t
@@ -1362,13 +1381,26 @@ dns_zonemgr_create(isc_mem_t *mctx, isc_taskmgr_t *taskmgr,
 		   isc_timermgr_t *timermgr, isc_socketmgr_t *socketmgr,
 		   dns_zonemgr_t **zmgrp);
 /*%<
- * Create a zone manager.
+ * Create a zone manager.  Note: the zone manager will not be able to
+ * manage any zones until dns_zonemgr_setsize() has been run.
  *
  * Requires:
  *\li	'mctx' to be a valid memory context.
  *\li	'taskmgr' to be a valid task manager.
  *\li	'timermgr' to be a valid timer manager.
  *\li	'zmgrp'	to point to a NULL pointer.
+ */
+
+isc_result_t
+dns_zonemgr_setsize(dns_zonemgr_t *zmgr, int num_zones);
+/*%<
+ *	Set the size of the zone manager task pool.  This must be run
+ *	before zmgr can be used for managing zones.  Currently, it can only
+ *	be run once; the task pool cannot be resized.
+ *
+ * Requires:
+ *\li	zmgr is a valid zone manager.
+ *\li	zmgr->zonetasks has been initialized.
  */
 
 isc_result_t
@@ -1539,6 +1571,32 @@ dns_zonemgr_unreachableadd(dns_zonemgr_t *zmgr, isc_sockaddr_t *remote,
  *\li	'local' to be a valid sockaddr.
  */
 
+isc_boolean_t
+dns_zonemgr_unreachable(dns_zonemgr_t *zmgr, isc_sockaddr_t *remote,
+			isc_sockaddr_t *local, isc_time_t *now);
+/*%<
+ *	Returns ISC_TRUE if the given local/remote address pair
+ *	is found in the zone maanger's unreachable cache.
+ *
+ * Requires:
+ *\li	'zmgr' to be a valid zone manager.
+ *\li	'remote' to be a valid sockaddr.
+ *\li	'local' to be a valid sockaddr.
+ *\li	'now' != NULL
+ */
+
+void
+dns_zonemgr_unreachabledel(dns_zonemgr_t *zmgr, isc_sockaddr_t *remote,
+			   isc_sockaddr_t *local);
+/*%<
+ *	Remove the pair of addresses from the unreachable cache.
+ *
+ * Requires:
+ *\li	'zmgr' to be a valid zone manager.
+ *\li	'remote' to be a valid sockaddr.
+ *\li	'local' to be a valid sockaddr.
+ */
+
 void
 dns_zone_forcereload(dns_zone_t *zone);
 /*%<
@@ -1686,7 +1744,7 @@ void
 dns_zone_setcheckmx(dns_zone_t *zone, dns_checkmxfunc_t checkmx);
 /*%<
  *	Set the post load integrity callback function 'checkmx'.
- *	'checkmx' will be called if the MX is not within the zone.
+ *	'checkmx' will be called if the MX TARGET is not within the zone.
  *
  * Require:
  *	'zone' to be a valid zone.
@@ -1705,8 +1763,8 @@ dns_zone_setchecksrv(dns_zone_t *zone, dns_checkmxfunc_t checksrv);
 void
 dns_zone_setcheckns(dns_zone_t *zone, dns_checknsfunc_t checkns);
 /*%<
- *	Set the post load integrity callback function 'checkmx'.
- *	'checkmx' will be called if the MX is not within the zone.
+ *	Set the post load integrity callback function 'checkns'.
+ *	'checkns' will be called if the NS TARGET is not within the zone.
  *
  * Require:
  *	'zone' to be a valid zone.
@@ -1758,7 +1816,7 @@ dns_zone_setsignatures(dns_zone_t *zone, isc_uint32_t signatures);
 
 isc_result_t
 dns_zone_signwithkey(dns_zone_t *zone, dns_secalg_t algorithm,
-		     isc_uint16_t keyid, isc_boolean_t delete);
+		     isc_uint16_t keyid, isc_boolean_t deleteit);
 /*%<
  * Initiate/resume signing of the entire zone with the zone DNSKEY(s)
  * that match the given algorithm and keyid.
@@ -1827,6 +1885,29 @@ dns_zone_getadded(dns_zone_t *zone);
  * Requires:
  * \li	'zone' to be valid.
  */
+
+isc_result_t
+dns_zone_dlzpostload(dns_zone_t *zone, dns_db_t *db);
+/*%
+ * Load the origin names for a writeable DLZ database.
+ */
+
+isc_result_t
+dns_zone_synckeyzone(dns_zone_t *zone);
+/*%
+ * Force the managed key zone to synchronize, and start the key
+ * maintenance timer.
+ */
+
+isc_result_t
+dns_zone_rpz_enable(dns_zone_t *zone, dns_rpz_zones_t *rpzs,
+		    dns_rpz_num_t rpz_num);
+/*%
+ * Set the response policy associated with a zone.
+ */
+
+dns_rpz_num_t
+dns_zone_get_rpz_num(dns_zone_t *zone);
 
 ISC_LANG_ENDDECLS
 

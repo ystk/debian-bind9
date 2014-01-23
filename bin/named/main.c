@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2011  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: main.c,v 1.175.60.3.8.1 2010/09/15 12:13:29 marka Exp $ */
+/* $Id: main.c,v 1.180.14.4 2011/11/05 00:45:52 each Exp $ */
 
 /*! \file */
 
@@ -51,6 +51,8 @@
 
 #include <dst/result.h>
 
+#include <dlz/dlz_dlopen_driver.h>
+
 /*
  * Defining NS_MAIN provides storage declarations (rather than extern)
  * for variables in named/globals.h.
@@ -70,15 +72,21 @@
 #include <named/ns_smf_globals.h>
 #endif
 
+#ifdef OPENSSL
+#include <openssl/opensslv.h>
+#endif
+#ifdef HAVE_LIBXML2
+#include <libxml/xmlversion.h>
+#endif
 /*
  * Include header files for database drivers here.
  */
 /* #include "xxdb.h" */
 
+#ifdef CONTRIB_DLZ
 /*
- * Include DLZ drivers if appropriate.
+ * Include contributed DLZ drivers if appropriate.
  */
-#ifdef DLZ
 #include <dlz/dlz_drivers.h>
 #endif
 
@@ -528,6 +536,14 @@ parse_command_line(int argc, char *argv[]) {
 		case 'V':
 			printf("BIND %s built with %s\n", ns_g_version,
 				ns_g_configargs);
+#ifdef OPENSSL
+			printf("using OpenSSL version: %s\n",
+			       OPENSSL_VERSION_TEXT);
+#endif
+#ifdef HAVE_LIBXML2
+			printf("using libxml2 version: %s\n",
+			       LIBXML_DOTTED_VERSION);
+#endif
 			exit(0);
 		case 'F':
 			/* Reserved for FIPS mode */
@@ -546,6 +562,7 @@ parse_command_line(int argc, char *argv[]) {
 
 	argc -= isc_commandline_index;
 	argv += isc_commandline_index;
+	POST(argv);
 
 	if (argc > 0) {
 		usage();
@@ -599,14 +616,6 @@ create_managers(void) {
 			      ISC_LOG_INFO, "using up to %u sockets", socks);
 	}
 
-	result = isc_entropy_create(ns_g_mctx, &ns_g_entropy);
-	if (result != ISC_R_SUCCESS) {
-		UNEXPECTED_ERROR(__FILE__, __LINE__,
-				 "isc_entropy_create() failed: %s",
-				 isc_result_totext(result));
-		return (ISC_R_UNEXPECTED);
-	}
-
 	result = isc_hash_create(ns_g_mctx, ns_g_entropy, DNS_NAME_MAXWIRE);
 	if (result != ISC_R_SUCCESS) {
 		UNEXPECTED_ERROR(__FILE__, __LINE__,
@@ -621,10 +630,6 @@ create_managers(void) {
 static void
 destroy_managers(void) {
 	ns_lwresd_shutdown();
-
-	isc_entropy_detach(&ns_g_entropy);
-	if (ns_g_fallbackentropy != NULL)
-		isc_entropy_detach(&ns_g_fallbackentropy);
 
 	/*
 	 * isc_taskmgr_destroy() will block until all tasks have exited,
@@ -726,6 +731,21 @@ setup(void) {
 	}
 #endif
 
+	result = isc_entropy_create(ns_g_mctx, &ns_g_entropy);
+	if (result != ISC_R_SUCCESS)
+		ns_main_earlyfatal("isc_entropy_create() failed: %s",
+				   isc_result_totext(result));
+
+	/*
+	 * DST may load additional libraries, which must be done before
+	 * chroot
+	 */
+	result = dst_lib_init2(ns_g_mctx, ns_g_entropy,
+			       ns_g_engine, ISC_ENTROPY_GOODONLY);
+	if (result != ISC_R_SUCCESS)
+		ns_main_earlyfatal("dst_lib_init2() failed: %s",
+				   isc_result_totext(result));
+
 #ifdef ISC_PLATFORM_USETHREADS
 	/*
 	 * Check for the number of cpu's before ns_os_chroot().
@@ -775,6 +795,25 @@ setup(void) {
 
 	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
 		      ISC_LOG_NOTICE, "built with %s", ns_g_configargs);
+
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
+		      ISC_LOG_NOTICE,
+		      "----------------------------------------------------");
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
+		      ISC_LOG_NOTICE,
+		      "BIND 9 is maintained by Internet Systems Consortium,");
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
+		      ISC_LOG_NOTICE,
+		      "Inc. (ISC), a non-profit 501(c)(3) public-benefit ");
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
+		      ISC_LOG_NOTICE,
+		      "corporation.  Support and training for BIND 9 are ");
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
+		      ISC_LOG_NOTICE,
+		      "available at https://www.isc.org/support");
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
+		      ISC_LOG_NOTICE,
+		      "----------------------------------------------------");
 
 	dump_symboltable();
 
@@ -842,9 +881,19 @@ setup(void) {
 	 */
 	/* xxdb_init(); */
 
-#ifdef DLZ
+#ifdef ISC_DLZ_DLOPEN
 	/*
-	 * Register any DLZ drivers.
+	 * Register the DLZ "dlopen" driver.
+	 */
+	result = dlz_dlopen_init(ns_g_mctx);
+	if (result != ISC_R_SUCCESS)
+		ns_main_earlyfatal("dlz_dlopen_init() failed: %s",
+				   isc_result_totext(result));
+#endif
+
+#if CONTRIB_DLZ
+	/*
+	 * Register any other contributed DLZ drivers.
 	 */
 	result = dlz_drivers_init();
 	if (result != ISC_R_SUCCESS)
@@ -863,16 +912,28 @@ cleanup(void) {
 
 	ns_builtin_deinit();
 
+	dst_lib_destroy();
+
+	isc_entropy_detach(&ns_g_entropy);
+	if (ns_g_fallbackentropy != NULL)
+		isc_entropy_detach(&ns_g_fallbackentropy);
+
 	/*
 	 * Add calls to unregister sdb drivers here.
 	 */
 	/* xxdb_clear(); */
 
-#ifdef DLZ
+#ifdef CONTRIB_DLZ
 	/*
-	 * Unregister any DLZ drivers.
+	 * Unregister contributed DLZ drivers.
 	 */
 	dlz_drivers_clear();
+#endif
+#ifdef ISC_DLZ_DLOPEN
+	/*
+	 * Unregister "dlopen" DLZ driver.
+	 */
+	dlz_dlopen_clear();
 #endif
 
 	dns_name_destroy();
