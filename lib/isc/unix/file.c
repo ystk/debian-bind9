@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2007, 2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004, 2005, 2007, 2009, 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2002  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -48,7 +48,7 @@
  * SUCH DAMAGE.
  */
 
-/* $Id: file.c,v 1.55 2009/08/28 03:13:08 each Exp $ */
+/* $Id$ */
 
 /*! \file */
 
@@ -93,6 +93,20 @@ file_stats(const char *file, struct stat *stats) {
 
 	if (stat(file, stats) != 0)
 		result = isc__errno2result(errno);
+
+	return (result);
+}
+
+isc_result_t
+isc_file_mode(const char *file, mode_t *modep) {
+	isc_result_t result;
+	struct stat stats;
+
+	REQUIRE(modep != NULL);
+
+	result = file_stats(file, &stats);
+	if (result == ISC_R_SUCCESS)
+		*modep = (stats.st_mode & 07777);
 
 	return (result);
 }
@@ -243,16 +257,26 @@ isc_file_renameunique(const char *file, char *templet) {
 	return (ISC_R_SUCCESS);
 }
 
-
 isc_result_t
 isc_file_openunique(char *templet, FILE **fp) {
+	int mode = S_IWUSR|S_IRUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
+	return (isc_file_openuniquemode(templet, mode, fp));
+}
+
+isc_result_t
+isc_file_openuniqueprivate(char *templet, FILE **fp) {
+	int mode = S_IWUSR|S_IRUSR;
+	return (isc_file_openuniquemode(templet, mode, fp));
+}
+
+isc_result_t
+isc_file_openuniquemode(char *templet, int mode, FILE **fp) {
 	int fd;
 	FILE *f;
 	isc_result_t result = ISC_R_SUCCESS;
 	char *x;
 	char *cp;
 	isc_uint32_t which;
-	int mode;
 
 	REQUIRE(templet != NULL);
 	REQUIRE(fp != NULL && *fp == NULL);
@@ -270,7 +294,6 @@ isc_file_openunique(char *templet, FILE **fp) {
 		x = cp--;
 	}
 
-	mode = S_IWUSR|S_IRUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
 
 	while ((fd = open(templet, O_RDWR|O_CREAT|O_EXCL, mode)) == -1) {
 		if (errno != EEXIST)
@@ -301,6 +324,23 @@ isc_file_openunique(char *templet, FILE **fp) {
 		*fp = f;
 
 	return (result);
+}
+
+isc_result_t
+isc_file_bopenunique(char *templet, FILE **fp) {
+	int mode = S_IWUSR|S_IRUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
+	return (isc_file_openuniquemode(templet, mode, fp));
+}
+
+isc_result_t
+isc_file_bopenuniqueprivate(char *templet, FILE **fp) {
+	int mode = S_IWUSR|S_IRUSR;
+	return (isc_file_openuniquemode(templet, mode, fp));
+}
+
+isc_result_t
+isc_file_bopenuniquemode(char *templet, int mode, FILE **fp) {
+	return (isc_file_openuniquemode(templet, mode, fp));
 }
 
 isc_result_t
@@ -337,6 +377,23 @@ isc_file_exists(const char *pathname) {
 	REQUIRE(pathname != NULL);
 
 	return (ISC_TF(file_stats(pathname, &stats) == ISC_R_SUCCESS));
+}
+
+isc_result_t
+isc_file_isplainfile(const char *filename) {
+	/*
+	 * This function returns success if filename is a plain file.
+	 */
+	struct stat filestat;
+	memset(&filestat,0,sizeof(struct stat));
+
+	if ((stat(filename, &filestat)) == -1)
+		return(isc__errno2result(errno));
+
+	if(! S_ISREG(filestat.st_mode))
+		return(ISC_R_INVALIDFILE);
+
+	return(ISC_R_SUCCESS);
 }
 
 isc_boolean_t

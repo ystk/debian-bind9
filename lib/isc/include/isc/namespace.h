@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2009, 2010, 2012  Internet Systems Consortium, Inc. ("ISC")
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +14,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: namespace.h,v 1.5.62.2 2010/08/13 23:46:28 tbox Exp $ */
+/* $Id$ */
 
 #ifndef ISCAPI_NAMESPACE_H
 #define ISCAPI_NAMESPACE_H 1
@@ -129,6 +129,7 @@
 #define isc_task_create isc__task_create
 #define isc_task_attach isc__task_attach
 #define isc_task_detach isc__task_detach
+/* #define isc_task_exiting isc__task_exiting XXXMPA */
 #define isc_task_send isc__task_send
 #define isc_task_sendanddetach isc__task_sendanddetach
 #define isc_task_purgerange isc__task_purgerange
@@ -145,6 +146,8 @@
 #define isc_task_getcurrenttime isc__task_getcurrenttime
 #define isc_taskmgr_create isc__taskmgr_create
 #define isc_taskmgr_destroy isc__taskmgr_destroy
+#define isc_taskmgr_setexcltask isc__taskmgr_setexcltask
+#define isc_taskmgr_excltask isc__taskmgr_excltask
 #define isc_task_beginexclusive isc__task_beginexclusive
 #define isc_task_endexclusive isc__task_endexclusive
 

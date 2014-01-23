@@ -136,6 +136,8 @@ isc__task_unsend
 isc__task_unsendrange
 isc__taskmgr_create
 isc__taskmgr_destroy
+isc__taskmgr_excltask
+isc__taskmgr_setexcltask
 isc__timer_attach
 isc__timer_create
 isc__timer_detach
@@ -212,13 +214,20 @@ isc_event_allocate
 isc_event_free
 isc_file_absolutepath
 isc_file_basename
+isc_file_bopenunique
+isc_file_bopenuniquemode
+isc_file_bopenuniqueprivate
 isc_file_exists
 isc_file_getmodtime
 isc_file_isabsolute
 isc_file_ischdiridempotent
 isc_file_iscurrentdir
+isc_file_isplainfile
 isc_file_mktemplate
+isc_file_mode
 isc_file_openunique
+isc_file_openuniquemode
+isc_file_openuniqueprivate
 isc_file_progname
 isc_file_remove
 isc_file_rename
@@ -382,6 +391,7 @@ isc_netaddr_fromin6
 isc_netaddr_frompath
 isc_netaddr_fromsockaddr
 isc_netaddr_fromv4mapped
+isc_netaddr_getzone
 isc_netaddr_ismulticast
 isc_netaddr_masktoprefixlen
 isc_netaddr_prefixok
@@ -527,7 +537,9 @@ isc_syslog_facilityfromstring
 isc_taskmgr_renderxml
 isc_taskpool_create
 isc_taskpool_destroy
+isc_taskpool_expand
 isc_taskpool_gettask
+isc_taskpool_size
 isc_thread_create
 isc_thread_join
 isc_thread_key_create

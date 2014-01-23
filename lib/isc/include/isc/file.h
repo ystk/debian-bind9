@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2007, 2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2007, 2009, 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000, 2001  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: file.h,v 1.37 2009/08/28 03:13:08 each Exp $ */
+/* $Id$ */
 
 #ifndef ISC_FILE_H
 #define ISC_FILE_H 1
@@ -25,12 +25,16 @@
 #include <stdio.h>
 
 #include <isc/lang.h>
+#include <isc/stat.h>
 #include <isc/types.h>
 
 ISC_LANG_BEGINDECLS
 
 isc_result_t
 isc_file_settime(const char *file, isc_time_t *time);
+
+isc_result_t
+isc_file_mode(const char *file, mode_t *modep);
 
 isc_result_t
 isc_file_getmodtime(const char *file, isc_time_t *time);
@@ -97,11 +101,22 @@ isc_file_mktemplate(const char *path, char *buf, size_t buflen);
  *				of the path with the internal template string.
  */
 
-
 isc_result_t
 isc_file_openunique(char *templet, FILE **fp);
+isc_result_t
+isc_file_openuniqueprivate(char *templet, FILE **fp);
+isc_result_t
+isc_file_openuniquemode(char *templet, int mode, FILE **fp);
+isc_result_t
+isc_file_bopenunique(char *templet, FILE **fp);
+isc_result_t
+isc_file_bopenuniqueprivate(char *templet, FILE **fp);
+isc_result_t
+isc_file_bopenuniquemode(char *templet, int mode, FILE **fp);
 /*!<
  * \brief Create and open a file with a unique name based on 'templet'.
+ *	isc_file_bopen*() open the file in binary mode in Windows. 
+ *	isc_file_open*() open the file in text mode in Windows. 
  *
  * Notes:
  *\li	'template' is a reserved work in C++.  If you want to complain
@@ -179,6 +194,27 @@ isc_boolean_t
 isc_file_isabsolute(const char *filename);
 /*!<
  * \brief Return #ISC_TRUE if the given file name is absolute.
+ */
+
+isc_result_t
+isc_file_isplainfile(const char *name);
+/*!<
+ * \brief Check that the file is a plain file
+ *
+ * Returns:
+ *\li	#ISC_R_SUCCESS
+ *		Success. The file is a plain file.
+ *\li	#ISC_R_INVALIDFILE
+ *		The path specified was not usable by the operating system.
+ *\li	#ISC_R_FILENOTFOUND
+ *		The file does not exist. This return code comes from
+ *		errno=ENOENT when stat returns -1. This code is mentioned
+ *		here, because in logconf.c, it is the one rcode that is
+ *		permitted in addition to ISC_R_SUCCESS. This is done since
+ *		the next call in logconf.c is to isc_stdio_open(), which
+ *		will create the file if it can.
+ *\li	#other ISC_R_* errors translated from errno
+ *		These occur when stat returns -1 and an errno.
  */
 
 isc_boolean_t

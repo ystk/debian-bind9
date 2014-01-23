@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: rdataset.h,v 1.67.186.2 2010/02/25 05:25:53 tbox Exp $ */
+/* $Id$ */
 
 #ifndef DNS_RDATASET_H
 #define DNS_RDATASET_H 1
@@ -56,6 +56,7 @@
 #include <isc/stdtime.h>
 
 #include <dns/types.h>
+#include <dns/rdatastruct.h>
 
 ISC_LANG_BEGINDECLS
 
@@ -203,6 +204,7 @@ struct dns_rdataset {
 #define DNS_RDATASETATTR_RESIGN		0x00040000
 #define DNS_RDATASETATTR_CLOSEST	0x00080000
 #define DNS_RDATASETATTR_OPTOUT		0x00100000	/*%< OPTOUT proof */
+#define DNS_RDATASETATTR_NEGATIVE	0x00200000
 
 /*%
  * _OMITDNSSEC:
@@ -648,6 +650,31 @@ void
 dns_rdataset_expire(dns_rdataset_t *rdataset);
 /*%<
  * Mark the rdataset to be expired in the backing database.
+ */
+
+void
+dns_rdataset_trimttl(dns_rdataset_t *rdataset, dns_rdataset_t *sigrdataset,
+		     dns_rdata_rrsig_t *rrsig, isc_stdtime_t now,
+		     isc_boolean_t acceptexpired);
+/*%<
+ * Trim the ttl of 'rdataset' and 'sigrdataset' so that they will expire
+ * at or before 'rrsig->expiretime'.  If 'acceptexpired' is true and the
+ * signature has expired or will expire in the next 120 seconds, limit
+ * the ttl to be no more than 120 seconds.
+ *
+ * The ttl is further limited by the original ttl as stored in 'rrsig'
+ * and the original ttl values of 'rdataset' and 'sigrdataset'.
+ *
+ * Requires:
+ * \li	'rdataset' is a valid rdataset.
+ * \li	'sigrdataset' is a valid rdataset.
+ * \li	'rrsig' is non NULL.
+ */
+
+const char *
+dns_trust_totext(dns_trust_t trust);
+/*
+ * Display trust in textual form.
  */
 
 ISC_LANG_ENDDECLS

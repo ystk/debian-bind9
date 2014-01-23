@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2009  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1998-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: task.c,v 1.111 2009/10/05 17:30:49 fdupont Exp $ */
+/* $Id$ */
 
 /*! \file
  * \author Principal Author: Bob Halley
@@ -152,6 +152,7 @@ struct isc__taskmgr {
 	unsigned int			tasks_running;
 	isc_boolean_t			exclusive_requested;
 	isc_boolean_t			exiting;
+	isc__task_t			*excl;
 #ifdef USE_SHARED_MANAGER
 	unsigned int			refs;
 #endif /* ISC_PLATFORM_USETHREADS */
@@ -221,6 +222,10 @@ isc__taskmgr_create(isc_mem_t *mctx, unsigned int workers,
 		    unsigned int default_quantum, isc_taskmgr_t **managerp);
 ISC_TASKFUNC_SCOPE void
 isc__taskmgr_destroy(isc_taskmgr_t **managerp);
+ISC_TASKFUNC_SCOPE void
+isc__taskmgr_setexcltask(isc_taskmgr_t *mgr0, isc_task_t *task0);
+ISC_TASKFUNC_SCOPE isc_result_t
+isc__taskmgr_excltask(isc_taskmgr_t *mgr0, isc_task_t **taskp);
 ISC_TASKFUNC_SCOPE isc_result_t
 isc__task_beginexclusive(isc_task_t *task);
 ISC_TASKFUNC_SCOPE void
@@ -233,9 +238,7 @@ static struct isc__taskmethods {
 	 * The following are defined just for avoiding unused static functions.
 	 */
 #ifndef BIND9
-	void *purgeevent, *unsendrange,
-		*getname, *gettag, *getcurrenttime, *beginexclusive,
-		*endexclusive;
+	void *purgeevent, *unsendrange, *getname, *gettag, *getcurrenttime;
 #endif
 } taskmethods = {
 	{
@@ -249,20 +252,23 @@ static struct isc__taskmethods {
 		isc__task_shutdown,
 		isc__task_setname,
 		isc__task_purge,
-		isc__task_purgerange
+		isc__task_purgerange,
+		isc__task_beginexclusive,
+		isc__task_endexclusive
 	}
 #ifndef BIND9
 	,
 	(void *)isc__task_purgeevent, (void *)isc__task_unsendrange,
 	(void *)isc__task_getname, (void *)isc__task_gettag,
-	(void *)isc__task_getcurrenttime, (void *)isc__task_beginexclusive,
-	(void *)isc__task_endexclusive
+	(void *)isc__task_getcurrenttime
 #endif
 };
 
 static isc_taskmgrmethods_t taskmgrmethods = {
 	isc__taskmgr_destroy,
-	isc__task_create
+	isc__task_create,
+	isc__taskmgr_setexcltask,
+	isc__taskmgr_excltask
 };
 
 /***
@@ -1211,6 +1217,8 @@ isc__taskmgr_create(isc_mem_t *mctx, unsigned int workers,
 
 #ifdef USE_SHARED_MANAGER
 	if (taskmgr != NULL) {
+		if (taskmgr->refs == 0)
+			return (ISC_R_SHUTTINGDOWN);
 		taskmgr->refs++;
 		*managerp = (isc_taskmgr_t *)taskmgr;
 		return (ISC_R_SUCCESS);
@@ -1261,6 +1269,7 @@ isc__taskmgr_create(isc_mem_t *mctx, unsigned int workers,
 	manager->tasks_running = 0;
 	manager->exclusive_requested = ISC_FALSE;
 	manager->exiting = ISC_FALSE;
+	manager->excl = NULL;
 
 	isc_mem_attach(mctx, &manager->mctx);
 
@@ -1326,8 +1335,8 @@ isc__taskmgr_destroy(isc_taskmgr_t **managerp) {
 #endif /* USE_WORKER_THREADS */
 
 #ifdef USE_SHARED_MANAGER
-	if (manager->refs > 1) {
-		manager->refs--;
+	manager->refs--;
+	if (manager->refs > 0) {
 		*managerp = NULL;
 		return;
 	}
@@ -1341,6 +1350,12 @@ isc__taskmgr_destroy(isc_taskmgr_t **managerp) {
 	 * isc_taskmgr_destroy(), e.g. by signalling a condition variable
 	 * that the startup thread is sleeping on.
 	 */
+
+	/*
+	 * Detach the exclusive task before acquiring the manager lock
+	 */
+	if (manager->excl != NULL)
+		isc__task_detach((isc_task_t **) &manager->excl);
 
 	/*
 	 * Unlike elsewhere, we're going to hold this lock a long time.
@@ -1397,6 +1412,9 @@ isc__taskmgr_destroy(isc_taskmgr_t **managerp) {
 		isc_mem_printallactive(stderr);
 #endif
 	INSIST(ISC_LIST_EMPTY(manager->tasks));
+#ifdef USE_SHARED_MANAGER
+	taskmgr = NULL;
+#endif
 #endif /* USE_WORKER_THREADS */
 
 	manager_free(manager);
@@ -1436,12 +1454,41 @@ isc__taskmgr_dispatch(isc_taskmgr_t *manager0) {
 
 #endif /* USE_WORKER_THREADS */
 
+ISC_TASKFUNC_SCOPE void
+isc__taskmgr_setexcltask(isc_taskmgr_t *mgr0, isc_task_t *task0) {
+	isc__taskmgr_t *mgr = (isc__taskmgr_t *) mgr0;
+	isc__task_t *task = (isc__task_t *) task0;
+
+	REQUIRE(VALID_MANAGER(mgr));
+	REQUIRE(VALID_TASK(task));
+	if (mgr->excl != NULL)
+		isc__task_detach((isc_task_t **) &mgr->excl);
+	isc__task_attach(task0, (isc_task_t **) &mgr->excl);
+}
+
+ISC_TASKFUNC_SCOPE isc_result_t
+isc__taskmgr_excltask(isc_taskmgr_t *mgr0, isc_task_t **taskp) {
+	isc__taskmgr_t *mgr = (isc__taskmgr_t *) mgr0;
+
+	REQUIRE(VALID_MANAGER(mgr));
+	REQUIRE(taskp != NULL && *taskp == NULL);
+
+	if (mgr->excl == NULL)
+		return (ISC_R_NOTFOUND);
+
+	isc__task_attach((isc_task_t *) mgr->excl, taskp);
+	return (ISC_R_SUCCESS);
+}
+
 ISC_TASKFUNC_SCOPE isc_result_t
 isc__task_beginexclusive(isc_task_t *task0) {
 #ifdef USE_WORKER_THREADS
 	isc__task_t *task = (isc__task_t *)task0;
 	isc__taskmgr_t *manager = task->manager;
+
 	REQUIRE(task->state == task_state_running);
+	/* XXX: Require task == manager->excl? */
+
 	LOCK(&manager->lock);
 	if (manager->exclusive_requested) {
 		UNLOCK(&manager->lock);
@@ -1481,6 +1528,15 @@ isc__task_register() {
 	return (isc_task_register(isc__taskmgr_create));
 }
 #endif
+
+isc_boolean_t
+isc_task_exiting(isc_task_t *t) {
+	isc__task_t *task = (isc__task_t *)t;
+
+	REQUIRE(VALID_TASK(task));
+	return (TASK_SHUTTINGDOWN(task));
+}
+
 
 #if defined(HAVE_LIBXML2) && defined(BIND9)
 void

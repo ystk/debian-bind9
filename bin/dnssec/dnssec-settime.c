@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2009-2012  Internet Systems Consortium, Inc. ("ISC")
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,7 +14,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: dnssec-settime.c,v 1.19.34.8 2010/08/16 23:46:30 tbox Exp $ */
+/* $Id: dnssec-settime.c,v 1.28.16.3 2011/06/02 20:24:11 each Exp $ */
 
 /*! \file */
 
@@ -38,6 +38,7 @@
 
 #include <dns/keyvalues.h>
 #include <dns/result.h>
+#include <dns/log.h>
 
 #include <dst/dst.h>
 
@@ -81,8 +82,7 @@ usage(void) {
 						     "deletion date\n");
 	fprintf(stderr, "Printing options:\n");
 	fprintf(stderr, "    -p C/P/A/R/I/D/all: print a particular time "
-						"value or values "
-						"[default: all]\n");
+						"value or values\n");
 	fprintf(stderr, "    -u:                 print times in unix epoch "
 						"format\n");
 	fprintf(stderr, "Output:\n");
@@ -152,6 +152,7 @@ main(int argc, char **argv) {
 	isc_boolean_t	force = ISC_FALSE;
 	isc_boolean_t   epoch = ISC_FALSE;
 	isc_boolean_t   changed = ISC_FALSE;
+	isc_log_t       *log = NULL;
 
 	if (argc == 1)
 		usage();
@@ -159,6 +160,8 @@ main(int argc, char **argv) {
 	result = isc_mem_create(0, 0, &mctx);
 	if (result != ISC_R_SUCCESS)
 		fatal("Out of memory");
+
+	setup_logging(verbose, mctx, &log);
 
 	dns_result_register();
 
@@ -386,7 +389,7 @@ main(int argc, char **argv) {
 			      "generating a successor.");
 
 		pub = act - prepub;
-		if (pub < now)
+		if (pub < now && prepub != 0)
 			fatal("Predecessor will become inactive before the\n\t"
 			      "prepublication period ends.  Either change "
 			      "its inactivation date,\n\t"
@@ -514,6 +517,16 @@ main(int argc, char **argv) {
 		dst_key_unsettime(key, DST_TIME_DELETE);
 
 	/*
+	 * No metadata changes were made but we're forcing an upgrade
+	 * to the new format anyway: use "-P now -A now" as the default
+	 */
+	if (force && !changed) {
+		dst_key_settime(key, DST_TIME_PUBLISH, now);
+		dst_key_settime(key, DST_TIME_ACTIVATE, now);
+		changed = ISC_TRUE;
+	}
+
+	/*
 	 * Print out time values, if -p was used.
 	 */
 	if (printcreate)
@@ -569,6 +582,7 @@ main(int argc, char **argv) {
 	cleanup_entropy(&ectx);
 	if (verbose > 10)
 		isc_mem_stats(mctx, stdout);
+	cleanup_logging(&log);
 	isc_mem_free(mctx, directory);
 	isc_mem_destroy(&mctx);
 

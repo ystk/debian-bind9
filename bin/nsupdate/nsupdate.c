@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: nsupdate.c,v 1.173.66.8 2010/08/10 23:47:45 tbox Exp $ */
+/* $Id: nsupdate.c,v 1.193.12.4 2011/11/03 04:30:09 each Exp $ */
 
 /*! \file */
 
@@ -81,6 +81,7 @@
 
 #ifdef GSSAPI
 #include <dst/gssapi.h>
+#include ISC_PLATFORM_KRB5HEADER
 #endif
 #include <bind9/getaddresses.h>
 
@@ -144,7 +145,7 @@ static dns_name_t tmpzonename;
 static dns_name_t restart_master;
 static dns_tsig_keyring_t *gssring = NULL;
 static dns_tsigkey_t *tsigkey = NULL;
-static dst_key_t *sig0key;
+static dst_key_t *sig0key = NULL;
 static lwres_context_t *lwctx = NULL;
 static lwres_conf_t *lwconf;
 static isc_sockaddr_t *servers;
@@ -415,7 +416,7 @@ reset_system(void) {
 		if (tsigkey != NULL)
 			dns_tsigkey_detach(&tsigkey);
 		if (gssring != NULL)
-			dns_tsigkeyring_destroy(&gssring);
+			dns_tsigkeyring_detach(&gssring);
 		tried_other_gsstsig = ISC_FALSE;
 	}
 }
@@ -641,6 +642,9 @@ setup_keyfile(isc_mem_t *mctx, isc_log_t *lctx) {
 
 	debug("Creating key...");
 
+	if (sig0key != NULL)
+		dst_key_free(&sig0key);
+
 	/* Try reading the key from a K* pair */
 	result = dst_key_fromnamedfile(keyfile, NULL,
 				       DST_TYPE_PRIVATE | DST_TYPE_KEY, mctx,
@@ -685,14 +689,16 @@ setup_keyfile(isc_mem_t *mctx, isc_log_t *lctx) {
 						   hmacname, dstkey, ISC_FALSE,
 						   NULL, 0, 0, mctx, NULL,
 						   &tsigkey);
+		dst_key_free(&dstkey);
 		if (result != ISC_R_SUCCESS) {
 			fprintf(stderr, "could not create key from %s: %s\n",
 				keyfile, isc_result_totext(result));
-			dst_key_free(&dstkey);
 			return;
 		}
-	} else
-		sig0key = dstkey;
+	} else {
+		dst_key_attach(dstkey, &sig0key);
+		dst_key_free(&dstkey);
+	}
 }
 
 static void
@@ -901,9 +907,12 @@ setup_system(void) {
 
 	if (keystr != NULL)
 		setup_keystr();
-	else if (local_only)
-		read_sessionkey(mctx, lctx);
-	else if (keyfile != NULL)
+	else if (local_only) {
+		result = read_sessionkey(mctx, lctx);
+		if (result != ISC_R_SUCCESS)
+			fatal("can't read key from %s: %s\n",
+			      keyfile, isc_result_totext(result));
+	} else if (keyfile != NULL)
 		setup_keyfile(mctx, lctx);
 }
 
@@ -1113,7 +1122,7 @@ parse_name(char **cmdlinep, dns_message_t *msg, dns_name_t **namep) {
 	isc_buffer_t source;
 
 	word = nsu_strsep(cmdlinep, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read owner name\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1144,6 +1153,11 @@ parse_rdata(char **cmdlinep, dns_rdataclass_t rdataclass,
 	isc_lex_t *lex = NULL;
 	dns_rdatacallbacks_t callbacks;
 	isc_result_t result;
+
+	if (cmdline == NULL) {
+		rdata->flags = DNS_RDATA_UPDATE;
+		return (STATUS_MORE);
+	}
 
 	while (*cmdline != 0 && isspace((unsigned char)*cmdline))
 		cmdline++;
@@ -1211,7 +1225,7 @@ make_prereq(char *cmdline, isc_boolean_t ispositive, isc_boolean_t isrrset) {
 	 */
 	if (isrrset) {
 		word = nsu_strsep(&cmdline, " \t\r\n");
-		if (*word == 0) {
+		if (word == NULL || *word == 0) {
 			fprintf(stderr, "could not read class or type\n");
 			goto failure;
 		}
@@ -1227,7 +1241,7 @@ make_prereq(char *cmdline, isc_boolean_t ispositive, isc_boolean_t isrrset) {
 			 * Now read the type.
 			 */
 			word = nsu_strsep(&cmdline, " \t\r\n");
-			if (*word == 0) {
+			if (word == NULL || *word == 0) {
 				fprintf(stderr, "could not read type\n");
 				goto failure;
 			}
@@ -1301,7 +1315,7 @@ evaluate_prereq(char *cmdline) {
 
 	ddebug("evaluate_prereq()");
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read operation code\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1335,14 +1349,14 @@ evaluate_server(char *cmdline) {
 	}
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read server name\n");
 		return (STATUS_SYNTAX);
 	}
 	server = word;
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0)
+	if (word == NULL || *word == 0)
 		port = dnsport;
 	else {
 		char *endp;
@@ -1376,14 +1390,14 @@ evaluate_local(char *cmdline) {
 	struct in6_addr in6;
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read server name\n");
 		return (STATUS_SYNTAX);
 	}
 	local = word;
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0)
+	if (word == NULL || *word == 0)
 		port = 0;
 	else {
 		char *endp;
@@ -1432,7 +1446,7 @@ evaluate_key(char *cmdline) {
 	char *n;
 
 	namestr = nsu_strsep(&cmdline, " \t\r\n");
-	if (*namestr == 0) {
+	if (namestr == NULL || *namestr == 0) {
 		fprintf(stderr, "could not read key name\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1456,7 +1470,7 @@ evaluate_key(char *cmdline) {
 	}
 
 	secretstr = nsu_strsep(&cmdline, "\r\n");
-	if (*secretstr == 0) {
+	if (secretstr == NULL || *secretstr == 0) {
 		fprintf(stderr, "could not read key secret\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1497,7 +1511,7 @@ evaluate_zone(char *cmdline) {
 	isc_result_t result;
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read zone name\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1523,7 +1537,7 @@ evaluate_realm(char *cmdline) {
 	char buf[1024];
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		if (realm != NULL)
 			isc_mem_free(mctx, realm);
 		realm = NULL;
@@ -1548,7 +1562,7 @@ evaluate_ttl(char *cmdline) {
 	isc_uint32_t ttl;
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not ttl\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1582,7 +1596,7 @@ evaluate_class(char *cmdline) {
 	dns_rdataclass_t rdclass;
 
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read class name\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1640,7 +1654,7 @@ update_addordelete(char *cmdline, isc_boolean_t isdelete) {
 	 * If it's a delete, ignore a TTL if present (for compatibility).
 	 */
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		if (!isdelete) {
 			fprintf(stderr, "could not read owner ttl\n");
 			goto failure;
@@ -1681,7 +1695,7 @@ update_addordelete(char *cmdline, isc_boolean_t isdelete) {
 	 */
 	word = nsu_strsep(&cmdline, " \t\r\n");
  parseclass:
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		if (isdelete) {
 			rdataclass = dns_rdataclass_any;
 			rdatatype = dns_rdatatype_any;
@@ -1705,7 +1719,7 @@ update_addordelete(char *cmdline, isc_boolean_t isdelete) {
 		 * Now read the type.
 		 */
 		word = nsu_strsep(&cmdline, " \t\r\n");
-		if (*word == 0) {
+		if (word == NULL || *word == 0) {
 			if (isdelete) {
 				rdataclass = dns_rdataclass_any;
 				rdatatype = dns_rdatatype_any;
@@ -1785,7 +1799,7 @@ evaluate_update(char *cmdline) {
 
 	ddebug("evaluate_update()");
 	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (*word == 0) {
+	if (word == NULL || *word == 0) {
 		fprintf(stderr, "could not read operation code\n");
 		return (STATUS_SYNTAX);
 	}
@@ -1875,6 +1889,7 @@ get_next_command(void) {
 	char cmdlinebuf[MAXCMD];
 	char *cmdline;
 	char *word;
+	char *tmp;
 
 	ddebug("get_next_command()");
 	if (interactive) {
@@ -1886,11 +1901,18 @@ get_next_command(void) {
 	isc_app_unblock();
 	if (cmdline == NULL)
 		return (STATUS_QUIT);
+
+	/*
+	 * Normalize input by removing any eol.
+	 */
+	tmp = cmdline;
+	(void)nsu_strsep(&tmp, "\r\n");
+
 	word = nsu_strsep(&cmdline, " \t\r\n");
 
 	if (feof(input))
 		return (STATUS_QUIT);
-	if (*word == 0)
+	if (word == NULL || *word == 0)
 		return (STATUS_SEND);
 	if (word[0] == ';')
 		return (STATUS_MORE);
@@ -2121,7 +2143,7 @@ send_update(dns_name_t *zonename, isc_sockaddr_t *master,
 {
 	isc_result_t result;
 	dns_request_t *request = NULL;
-	unsigned int options = 0;
+	unsigned int options = DNS_REQUESTOPT_CASE;
 
 	ddebug("send_update()");
 
@@ -2253,6 +2275,7 @@ recvsoa(isc_task_t *task, isc_event_t *event) {
 	}
 	check_result(result, "dns_request_getresponse");
 	section = DNS_SECTION_ANSWER;
+	POST(section);
 	if (debugging)
 		show_message(stderr, rcvmsg, "Reply from SOA query:");
 
@@ -2270,6 +2293,7 @@ recvsoa(isc_task_t *task, isc_event_t *event) {
 		dns_message_destroy(&soaquery);
 		ddebug("Out of recvsoa");
 		done_update();
+		seenerror = ISC_TRUE;
 		return;
 	}
 
@@ -2425,9 +2449,60 @@ sendrequest(isc_sockaddr_t *srcaddr, isc_sockaddr_t *destaddr,
 }
 
 #ifdef GSSAPI
+
+/*
+ * Get the realm from the users kerberos ticket if possible
+ */
 static void
-start_gssrequest(dns_name_t *master)
+get_ticket_realm(isc_mem_t *mctx)
 {
+	krb5_context ctx;
+	krb5_error_code rc;
+	krb5_ccache ccache;
+	krb5_principal princ;
+	char *name, *ticket_realm;
+
+	rc = krb5_init_context(&ctx);
+	if (rc != 0)
+		return;
+
+	rc = krb5_cc_default(ctx, &ccache);
+	if (rc != 0) {
+		krb5_free_context(ctx);
+		return;
+	}
+
+	rc = krb5_cc_get_principal(ctx, ccache, &princ);
+	if (rc != 0) {
+		krb5_cc_close(ctx, ccache);
+		krb5_free_context(ctx);
+		return;
+	}
+
+	rc = krb5_unparse_name(ctx, princ, &name);
+	if (rc != 0) {
+		krb5_free_principal(ctx, princ);
+		krb5_cc_close(ctx, ccache);
+		krb5_free_context(ctx);
+		return;
+	}
+
+	ticket_realm = strrchr(name, '@');
+	if (ticket_realm != NULL) {
+		realm = isc_mem_strdup(mctx, ticket_realm);
+	}
+
+	free(name);
+	krb5_free_principal(ctx, princ);
+	krb5_cc_close(ctx, ccache);
+	krb5_free_context(ctx);
+	if (realm != NULL && debugging)
+		fprintf(stderr, "Found realm from ticket: %s\n", realm+1);
+}
+
+
+static void
+start_gssrequest(dns_name_t *master) {
 	gss_ctx_id_t context;
 	isc_buffer_t buf;
 	isc_result_t result;
@@ -2438,12 +2513,13 @@ start_gssrequest(dns_name_t *master)
 	dns_fixedname_t fname;
 	char namestr[DNS_NAME_FORMATSIZE];
 	char keystr[DNS_NAME_FORMATSIZE];
+	char *err_message = NULL;
 
 	debug("start_gssrequest");
 	usevc = ISC_TRUE;
 
 	if (gssring != NULL)
-		dns_tsigkeyring_destroy(&gssring);
+		dns_tsigkeyring_detach(&gssring);
 	gssring = NULL;
 	result = dns_tsigkeyring_create(mctx, &gssring);
 
@@ -2464,6 +2540,9 @@ start_gssrequest(dns_name_t *master)
 
 	dns_fixedname_init(&fname);
 	servname = dns_fixedname_name(&fname);
+
+	if (realm == NULL)
+		get_ticket_realm(mctx);
 
 	result = isc_string_printf(servicename, sizeof(servicename),
 				   "DNS/%s%s", namestr, realm ? realm : "");
@@ -2506,9 +2585,11 @@ start_gssrequest(dns_name_t *master)
 	/* Build first request. */
 	context = GSS_C_NO_CONTEXT;
 	result = dns_tkey_buildgssquery(rmsg, keyname, servname, NULL, 0,
-					&context, use_win2k_gsstsig);
+					&context, use_win2k_gsstsig,
+					mctx, &err_message);
 	if (result == ISC_R_FAILURE)
-		fatal("Check your Kerberos ticket, it may have expired.");
+		fatal("tkey query failed: %s",
+		      err_message != NULL ? err_message : "unknown error");
 	if (result != ISC_R_SUCCESS)
 		fatal("dns_tkey_buildgssquery failed: %s",
 		      isc_result_totext(result));
@@ -2557,6 +2638,7 @@ recvgss(isc_task_t *task, isc_event_t *event) {
 	isc_buffer_t buf;
 	dns_name_t *servname;
 	dns_fixedname_t fname;
+	char *err_message = NULL;
 
 	UNUSED(task);
 
@@ -2645,7 +2727,8 @@ recvgss(isc_task_t *task, isc_event_t *event) {
 	tsigkey = NULL;
 	result = dns_tkey_gssnegotiate(tsigquery, rcvmsg, servname,
 				       &context, &tsigkey, gssring,
-				       use_win2k_gsstsig);
+				       use_win2k_gsstsig,
+				       &err_message);
 	switch (result) {
 
 	case DNS_R_CONTINUE:
@@ -2688,7 +2771,9 @@ recvgss(isc_task_t *task, isc_event_t *event) {
 		break;
 
 	default:
-		fatal("dns_tkey_negotiategss: %s", isc_result_totext(result));
+		fatal("dns_tkey_negotiategss: %s %s",
+		      isc_result_totext(result),
+		      err_message != NULL ? err_message : "");
 	}
 
  done:
@@ -2798,8 +2883,8 @@ cleanup(void) {
 		dns_tsigkey_detach(&tsigkey);
 	}
 	if (gssring != NULL) {
-		ddebug("Destroying GSS-TSIG keyring");
-		dns_tsigkeyring_destroy(&gssring);
+		ddebug("Detaching GSS-TSIG keyring");
+		dns_tsigkeyring_detach(&gssring);
 	}
 	if (kserver != NULL) {
 		isc_mem_put(mctx, kserver, sizeof(isc_sockaddr_t));
@@ -2810,6 +2895,9 @@ cleanup(void) {
 		realm = NULL;
 	}
 #endif
+
+	if (sig0key != NULL)
+		dst_key_free(&sig0key);
 
 	ddebug("Shutting down task manager");
 	isc_taskmgr_destroy(&taskmgr);
