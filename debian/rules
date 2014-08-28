@@ -23,6 +23,11 @@ else
 OPT = -O2
 endif
 
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+export MAKEFLAGS += -j$(NUMJOBS)
+endif
+
 export CFLAGS=-fno-strict-aliasing -DDIG_SIGCHASE $(DEBUG) $(OPT)
 
 ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
@@ -32,6 +37,8 @@ endif
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
+	dh_autotools-dev_updateconfig
+	dh_autoreconf
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
@@ -46,16 +53,19 @@ configure-stamp:
 		--with-gssapi=/usr \
 		--with-gnu-ld \
 		--with-geoip=/usr \
+		--with-atf=no \
 		--enable-ipv6 \
+		--enable-rrl \
+		--enable-filter-aaaa \
 		$(EXTRA_FEATURES)
 
-	touch configure-stamp
+	touch $@
 
-build: configure-stamp build-stamp
-build-stamp:
+build: build-stamp
+build-stamp: configure-stamp
 	dh_testdir
 	LD_LIBRARY_PATH=$$(pwd)/lib/isc/.libs:$$(pwd)/lib/isccc/.libs:$$(pwd)/isccfg/.libs:$${LD_LIBRARY_PATH} $(MAKE)
-	touch build-stamp
+	touch $@
 
 autofiles:
 	libtoolize --automake --copy --force
@@ -64,6 +74,7 @@ autofiles:
 	autoheader
 	autoconf
 	rm -rf autom4te.cache
+	cp config.guess config.sub contrib/idn/idnkit-1.0-src/
 
 clean:
 	dh_testdir
@@ -74,6 +85,8 @@ clean:
 	rm -f debian/substvars lib/bind/include/isc/platform.h
 	rm -f contrib/dlz/bin/dlzbdb/Makefile contrib/dlz/drivers/rules
 	rm -f doc/arm/Bv9ARM.pdf
+	dh_autoreconf_clean
+	dh_autotools-dev_restoreconfig
 	dh_clean
 
 newtemplate:
@@ -145,7 +158,12 @@ binary-arch: build install
 	dh_installdocs -a
 	dh_installexamples -a
 	dh_installmenu -a
+	dh_systemd_enable -pbind9 --no-enable bind9-resolvconf.service
+	dh_systemd_enable -pbind9 bind9.service
+	dh_systemd_enable -plwresd lwresd.service
 	dh_installinit -a --no-start -- defaults 15 85
+	# Ship the extra service file for resolvconf integration manually.
+	if [ -d debian/bind9/lib/systemd/system ]; then cp debian/bind9-resolvconf.service debian/bind9/lib/systemd/system; fi
 	dh_installcron -a
 	dh_installdebconf -pbind9
 	dh_installinfo -a
@@ -163,7 +181,7 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_makeshlibs -a
 	dh_installdeb -a
-	dh_shlibdeps -l"debian/libbind9-80/usr/lib:debian/libbind-dev/usr/lib:debian/libdns88/usr/lib:debian/libisc84/usr/lib:debian/libisccc80/usr/lib:debian/libisccfg82/usr/lib:debian/liblwres80/usr/lib:/usr/lib/libfakeroot" -a
+	dh_shlibdeps -l"debian/libbind9-90/usr/lib:debian/libbind-dev/usr/lib:debian/libdns100/usr/lib:debian/libisc95/usr/lib:debian/libisccc90/usr/lib:debian/libisccfg90/usr/lib:debian/liblwres90/usr/lib:/usr/lib/libfakeroot" -a
 	for i in $$(sed -n '/^Package:/s/^.* //p' debian/control); do cat debian/vars.in >> debian/$$i.substvars; done
 	cat debian/vars.in >> debian/substvars
 	dh_gencontrol -a

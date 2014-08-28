@@ -17,3 +17,5 @@
 sh clean.sh
 
 ../../../tools/genrandom 400 random.data
+
+(cd ns3; sh -e sign.sh)

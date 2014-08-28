@@ -84,4 +84,5 @@ install:: timestamp installdirs
 	${LIBTOOL_MODE_INSTALL} ${INSTALL_DATA} libisccc.@A@ ${DESTDIR}${libdir}
 
 clean distclean::
-	rm -f libisccc.@A@ timestamp libisccc.so 
+	rm -f libisccc.@A@ timestamp
+	rm -f libisccc.so 

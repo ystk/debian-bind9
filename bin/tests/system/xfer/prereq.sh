@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
+# Copyright (C) 2011, 2012, 2014  Internet Systems Consortium, Inc. ("ISC")
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,13 @@
 
 if $PERL -e 'use Net::DNS;' 2>/dev/null
 then
-    :
+    if $PERL -e 'use Net::DNS; die if $Net::DNS::VERSION == 0.73;' 2>/dev/null
+    then
+        :
+    else
+        echo "I:Net::DNS version 0.73 has a bug that causes this test to fail: please update." >&2
+        exit 1
+    fi
 else
     echo "I:This test requires the Net::DNS library." >&2
     exit 1

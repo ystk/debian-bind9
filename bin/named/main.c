@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2011  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2013  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: main.c,v 1.180.14.4 2011/11/05 00:45:52 each Exp $ */
+/* $Id$ */
 
 /*! \file */
 
@@ -45,6 +45,7 @@
 #include <isccc/result.h>
 
 #include <dns/dispatch.h>
+#include <dns/dynamic_db.h>
 #include <dns/name.h>
 #include <dns/result.h>
 #include <dns/view.h>
@@ -390,7 +391,7 @@ set_flags(const char *arg, struct flag_def *defs, unsigned int *ret) {
 		int arglen;
 		if (end == NULL)
 			end = arg + strlen(arg);
-		arglen = end - arg;
+		arglen = (int)(end - arg);
 		for (def = defs; def->name != NULL; def++) {
 			if (arglen == (int)strlen(def->name) &&
 			    memcmp(arg, def->name, arglen) == 0) {
@@ -415,10 +416,11 @@ parse_command_line(int argc, char *argv[]) {
 
 	save_command_line(argc, argv);
 
+	/* PLEASE keep options synchronized when main is hooked! */
 	isc_commandline_errprint = ISC_FALSE;
 	while ((ch = isc_commandline_parse(argc, argv,
 					   "46c:C:d:E:fFgi:lm:n:N:p:P:"
-					   "sS:t:T:u:vVx:")) != -1) {
+					   "sS:t:T:U:u:vVx:")) != -1) {
 		switch (ch) {
 		case '4':
 			if (disable4)
@@ -523,19 +525,51 @@ parse_command_line(int argc, char *argv[]) {
 				maxudp = 512;
 			else if (!strcmp(isc_commandline_argument, "maxudp1460"))
 				maxudp = 1460;
+			else if (!strcmp(isc_commandline_argument, "nosyslog"))
+				ns_g_nosyslog = ISC_TRUE;
+			else if (!strcmp(isc_commandline_argument, "nonearest"))
+				ns_g_nonearest = ISC_TRUE;
 			else
 				fprintf(stderr, "unknown -T flag '%s\n",
 					isc_commandline_argument);
+			break;
+		case 'U':
+			ns_g_udpdisp = parse_int(isc_commandline_argument,
+						 "number of UDP listeners "
+						 "per interface");
 			break;
 		case 'u':
 			ns_g_username = isc_commandline_argument;
 			break;
 		case 'v':
-			printf("BIND %s\n", ns_g_version);
+			printf("%s %s", ns_g_product, ns_g_version);
+			if (*ns_g_description != 0)
+				printf(" %s", ns_g_description);
+			printf("\n");
 			exit(0);
 		case 'V':
-			printf("BIND %s built with %s\n", ns_g_version,
-				ns_g_configargs);
+			printf("%s %s", ns_g_product, ns_g_version);
+			if (*ns_g_description != 0)
+				printf(" %s", ns_g_description);
+			printf(" <id:%s> built by %s with %s\n", ns_g_srcid,
+			       ns_g_builder, ns_g_configargs);
+#ifdef __clang__
+			printf("compiled by CLANG %s\n", __VERSION__);
+#else
+#if defined(__ICC) || defined(__INTEL_COMPILER)
+			printf("compiled by ICC %s\n", __VERSION__);
+#else
+#ifdef __GNUC__
+			printf("compiled by GCC %s\n", __VERSION__);
+#endif
+#endif
+#endif
+#ifdef _MSC_VER
+			printf("compiled by MSVC %d\n", _MSC_VER);
+#endif
+#ifdef __SUNPRO_C
+			printf("compiled by Solaris Studio %x\n", __SUNPRO_C);
+#endif
 #ifdef OPENSSL
 			printf("using OpenSSL version: %s\n",
 			       OPENSSL_VERSION_TEXT);
@@ -585,6 +619,18 @@ create_managers(void) {
 #else
 	ns_g_cpus = 1;
 #endif
+#ifdef WIN32
+	ns_g_udpdisp = 1;
+#else
+	if (ns_g_udpdisp == 0)
+		ns_g_udpdisp = ns_g_cpus_detected;
+	if (ns_g_udpdisp > ns_g_cpus)
+		ns_g_udpdisp = ns_g_cpus;
+#endif
+	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_SERVER,
+		      ISC_LOG_INFO, "using %u UDP listener%s per interface",
+		      ns_g_udpdisp, ns_g_udpdisp == 1 ? "" : "s");
+
 	result = isc_taskmgr_create(ns_g_mctx, ns_g_cpus, 0, &ns_g_taskmgr);
 	if (result != ISC_R_SUCCESS) {
 		UNEXPECTED_ERROR(__FILE__, __LINE__,
@@ -790,8 +836,8 @@ setup(void) {
 				   isc_result_totext(result));
 
 	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
-		      ISC_LOG_NOTICE, "starting BIND %s%s", ns_g_version,
-		      saved_command_line);
+		      ISC_LOG_NOTICE, "starting %s %s%s", ns_g_product,
+		      ns_g_version, saved_command_line);
 
 	isc_log_write(ns_g_lctx, NS_LOGCATEGORY_GENERAL, NS_LOGMODULE_MAIN,
 		      ISC_LOG_NOTICE, "built with %s", ns_g_configargs);
@@ -1025,6 +1071,8 @@ ns_smf_get_instance(char **ins_name, int debug, isc_mem_t *mctx) {
 }
 #endif /* HAVE_LIBSCF */
 
+/* main entry point, possibly hooked */
+
 int
 main(int argc, char *argv[]) {
 	isc_result_t result;
@@ -1038,9 +1086,9 @@ main(int argc, char *argv[]) {
 	 */
 	strlcat(version,
 #if defined(NO_VERSION_DATE) || !defined(__DATE__)
-		"named version: BIND " VERSION,
+		"named version: BIND " VERSION " <" SRCID ">",
 #else
-		"named version: BIND " VERSION " (" __DATE__ ")",
+		"named version: BIND " VERSION " <" SRCID "> (" __DATE__ ")",
 #endif
 		sizeof(version));
 	result = isc_file_progname(*argv, program_name, sizeof(program_name));

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2007, 2009, 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004, 2007, 2009, 2011-2013  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2002  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -171,7 +171,7 @@ isc_file_safemovefile(const char *oldname, const char *newname) {
 		tmpfd = mkstemp(buf, ISC_TRUE);
 		if (tmpfd > 0)
 			_close(tmpfd);
-		DeleteFile(buf);
+		(void)DeleteFile(buf);
 		_chmod(newname, _S_IREAD | _S_IWRITE);
 
 		filestatus = MoveFile(newname, buf);
@@ -198,7 +198,7 @@ isc_file_safemovefile(const char *oldname, const char *newname) {
 	 * Delete the backup file if it got created
 	 */
 	if (exists == TRUE)
-		filestatus = DeleteFile(buf);
+		(void)DeleteFile(buf);
 	return (0);
 }
 
@@ -278,7 +278,7 @@ isc_file_template(const char *path, const char *templet, char *buf,
 	s = strrchr(path, '\\');
 
 	if (s != NULL) {
-		if ((s - path + 1 + strlen(templet) + 1) > buflen)
+	  if ((s - path + 1 + strlen(templet) + 1) > (ssize_t)buflen)
 			return (ISC_R_NOSPACE);
 
 		strncpy(buf, path, s - path + 1);
@@ -296,7 +296,7 @@ isc_file_template(const char *path, const char *templet, char *buf,
 
 isc_result_t
 isc_file_renameunique(const char *file, char *templet) {
-	int fd = -1;
+	int fd;
 	int res = 0;
 	isc_result_t result = ISC_R_SUCCESS;
 
@@ -440,6 +440,23 @@ isc_file_isplainfile(const char *filename) {
 	return(ISC_R_SUCCESS);
 }
 
+isc_result_t
+isc_file_isdirectory(const char *filename) {
+	/*
+	 * This function returns success if filename is a directory.
+	 */
+	struct stat filestat;
+	memset(&filestat,0,sizeof(struct stat));
+
+	if ((stat(filename, &filestat)) == -1)
+		return(isc__errno2result(errno));
+
+	if(! S_ISDIR(filestat.st_mode))
+		return(ISC_R_INVALIDFILE);
+
+	return(ISC_R_SUCCESS);
+}
+
 isc_boolean_t
 isc_file_isabsolute(const char *filename) {
 	REQUIRE(filename != NULL);
@@ -538,7 +555,7 @@ isc_file_absolutepath(const char *filename, char *path, size_t pathlen) {
 	REQUIRE(filename != NULL);
 	REQUIRE(path != NULL);
 
-	retval = GetFullPathName(filename, pathlen, path, &ptrname);
+	retval = GetFullPathName(filename, (DWORD) pathlen, path, &ptrname);
 
 	/* Something went wrong in getting the path */
 	if (retval == 0)

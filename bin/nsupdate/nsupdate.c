@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2014  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 2000-2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: nsupdate.c,v 1.193.12.4 2011/11/03 04:30:09 each Exp $ */
+/* $Id$ */
 
 /*! \file */
 
@@ -81,10 +81,18 @@
 
 #ifdef GSSAPI
 #include <dst/gssapi.h>
+#ifdef WIN32
+#include <krb5/krb5.h>
+#else
 #include ISC_PLATFORM_KRB5HEADER
+#endif
 #endif
 #include <bind9/getaddresses.h>
 
+#if defined(HAVE_READLINE)
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
 #ifdef HAVE_ADDRINFO
 #ifdef HAVE_GETADDRINFO
@@ -539,8 +547,8 @@ setup_keystr(void) {
 		n = s;
 	}
 
-	isc_buffer_init(&keynamesrc, name, n - name);
-	isc_buffer_add(&keynamesrc, n - name);
+	isc_buffer_init(&keynamesrc, name, (unsigned int)(n - name));
+	isc_buffer_add(&keynamesrc, (unsigned int)(n - name));
 
 	debug("namefromtext");
 	result = dns_name_fromtext(keyname, &keynamesrc, dns_rootname, 0, NULL);
@@ -832,13 +840,16 @@ setup_system(void) {
 		if (servers == NULL)
 			fatal("out of memory");
 		for (i = 0; i < ns_total; i++) {
-			if (lwconf->nameservers[i].family == LWRES_ADDRTYPE_V4) {
+			if (lwconf->nameservers[i].family == LWRES_ADDRTYPE_V4)
+			{
 				struct in_addr in4;
-				memcpy(&in4, lwconf->nameservers[i].address, 4);
+				memmove(&in4,
+					lwconf->nameservers[i].address, 4);
 				isc_sockaddr_fromin(&servers[i], &in4, dnsport);
 			} else {
 				struct in6_addr in6;
-				memcpy(&in6, lwconf->nameservers[i].address, 16);
+				memmove(&in6,
+					lwconf->nameservers[i].address, 16);
 				isc_sockaddr_fromin6(&servers[i], &in6,
 						     dnsport);
 			}
@@ -930,7 +941,7 @@ get_address(char *host, in_port_t port, isc_sockaddr_t *sockaddr) {
 	INSIST(count == 1);
 }
 
-#define PARSE_ARGS_FMT "dDML:y:ghlovk:p:rR::t:u:"
+#define PARSE_ARGS_FMT "dDML:y:ghlovk:p:r:R::t:u:"
 
 static void
 pre_parse_args(int argc, char **argv) {
@@ -1535,16 +1546,20 @@ evaluate_realm(char *cmdline) {
 #ifdef GSSAPI
 	char *word;
 	char buf[1024];
+	int n;
 
-	word = nsu_strsep(&cmdline, " \t\r\n");
-	if (word == NULL || *word == 0) {
-		if (realm != NULL)
-			isc_mem_free(mctx, realm);
+	if (realm != NULL) {
+		isc_mem_free(mctx, realm);
 		realm = NULL;
-		return (STATUS_MORE);
 	}
 
-	snprintf(buf, sizeof(buf), "@%s", word);
+	word = nsu_strsep(&cmdline, " \t\r\n");
+	if (word == NULL || *word == 0)
+		return (STATUS_MORE);
+
+	n = snprintf(buf, sizeof(buf), "@%s", word);
+	if (n < 0 || (size_t)n >= sizeof(buf))
+		fatal("realm is too long");
 	realm = isc_mem_strdup(mctx, buf);
 	if (realm == NULL)
 		fatal("out of memory");
@@ -1805,6 +1820,8 @@ evaluate_update(char *cmdline) {
 	}
 	if (strcasecmp(word, "delete") == 0)
 		isdelete = ISC_TRUE;
+	else if (strcasecmp(word, "del") == 0)
+		isdelete = ISC_TRUE;
 	else if (strcasecmp(word, "add") == 0)
 		isdelete = ISC_FALSE;
 	else {
@@ -1883,35 +1900,13 @@ show_message(FILE *stream, dns_message_t *msg, const char *description) {
 	isc_buffer_free(&buf);
 }
 
-
 static isc_uint16_t
-get_next_command(void) {
-	char cmdlinebuf[MAXCMD];
-	char *cmdline;
+do_next_command(char *cmdline) {
 	char *word;
-	char *tmp;
 
-	ddebug("get_next_command()");
-	if (interactive) {
-		fprintf(stdout, "> ");
-		fflush(stdout);
-	}
-	isc_app_block();
-	cmdline = fgets(cmdlinebuf, MAXCMD, input);
-	isc_app_unblock();
-	if (cmdline == NULL)
-		return (STATUS_QUIT);
-
-	/*
-	 * Normalize input by removing any eol.
-	 */
-	tmp = cmdline;
-	(void)nsu_strsep(&tmp, "\r\n");
-
+	ddebug("do_next_command()");
 	word = nsu_strsep(&cmdline, " \t\r\n");
 
-	if (feof(input))
-		return (STATUS_QUIT);
 	if (word == NULL || *word == 0)
 		return (STATUS_SEND);
 	if (word[0] == ';')
@@ -1920,8 +1915,22 @@ get_next_command(void) {
 		return (STATUS_QUIT);
 	if (strcasecmp(word, "prereq") == 0)
 		return (evaluate_prereq(cmdline));
+	if (strcasecmp(word, "nxdomain") == 0)
+		return (make_prereq(cmdline, ISC_FALSE, ISC_FALSE));
+	if (strcasecmp(word, "yxdomain") == 0)
+		return (make_prereq(cmdline, ISC_TRUE, ISC_FALSE));
+	if (strcasecmp(word, "nxrrset") == 0)
+		return (make_prereq(cmdline, ISC_FALSE, ISC_TRUE));
+	if (strcasecmp(word, "yxrrset") == 0)
+		return (make_prereq(cmdline, ISC_TRUE, ISC_TRUE));
 	if (strcasecmp(word, "update") == 0)
 		return (evaluate_update(cmdline));
+	if (strcasecmp(word, "delete") == 0)
+		return (update_addordelete(cmdline, ISC_TRUE));
+	if (strcasecmp(word, "del") == 0)
+		return (update_addordelete(cmdline, ISC_TRUE));
+	if (strcasecmp(word, "add") == 0)
+		return (update_addordelete(cmdline, ISC_FALSE));
 	if (strcasecmp(word, "server") == 0)
 		return (evaluate_server(cmdline));
 	if (strcasecmp(word, "local") == 0)
@@ -1988,16 +1997,54 @@ get_next_command(void) {
 "oldgsstsig                (use Microsoft's GSS_TSIG to sign the request)\n"
 "zone name                 (set the zone to be updated)\n"
 "class CLASS               (set the zone's DNS class, e.g. IN (default), CH)\n"
-"prereq nxdomain name      (does this name not exist)\n"
-"prereq yxdomain name      (does this name exist)\n"
-"prereq nxrrset ....       (does this RRset exist)\n"
-"prereq yxrrset ....       (does this RRset not exist)\n"
-"update add ....           (add the given record to the zone)\n"
-"update delete ....        (remove the given record(s) from the zone)\n");
+"[prereq] nxdomain name    (does this name not exist)\n"
+"[prereq] yxdomain name    (does this name exist)\n"
+"[prereq] nxrrset ....     (does this RRset exist)\n"
+"[prereq] yxrrset ....     (does this RRset not exist)\n"
+"[update] add ....         (add the given record to the zone)\n"
+"[update] del[ete] ....    (remove the given record(s) from the zone)\n");
 		return (STATUS_MORE);
 	}
 	fprintf(stderr, "incorrect section name: %s\n", word);
 	return (STATUS_SYNTAX);
+}
+
+static isc_uint16_t
+get_next_command(void) {
+	isc_uint16_t result = STATUS_QUIT;
+	char cmdlinebuf[MAXCMD];
+	char *cmdline;
+
+	isc_app_block();
+	if (interactive) {
+#ifdef HAVE_READLINE
+		cmdline = readline("> ");
+		if (cmdline != NULL)
+			add_history(cmdline);
+#else
+		fprintf(stdout, "> ");
+		fflush(stdout);
+		cmdline = fgets(cmdlinebuf, MAXCMD, input);
+#endif
+	} else
+		cmdline = fgets(cmdlinebuf, MAXCMD, input);
+	isc_app_unblock();
+
+	if (cmdline != NULL) {
+		char *tmp = cmdline;
+
+		/*
+		 * Normalize input by removing any eol as readline()
+		 * removes eol but fgets doesn't.
+		 */
+		(void)nsu_strsep(&tmp, "\r\n");
+		result = do_next_command(cmdline);
+	}
+#ifdef HAVE_READLINE
+	if (interactive)
+		free(cmdline);
+#endif
+	return (result);
 }
 
 static isc_boolean_t
@@ -2536,7 +2583,7 @@ start_gssrequest(dns_name_t *master) {
 	if (userserver == NULL)
 		get_address(namestr, dnsport, kserver);
 	else
-		(void)memcpy(kserver, userserver, sizeof(isc_sockaddr_t));
+		(void)memmove(kserver, userserver, sizeof(isc_sockaddr_t));
 
 	dns_fixedname_init(&fname);
 	servname = dns_fixedname_name(&fname);

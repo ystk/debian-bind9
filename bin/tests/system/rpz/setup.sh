@@ -14,6 +14,8 @@
 # OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 
+# $Id$
+
 
 set -e
 
@@ -49,10 +51,7 @@ signzone ns2 tld2s. base-tld2s.db tld2s.db
 # Performance checks.
 cat <<EOF >ns5/rpz-switch
 response-policy {
-	zone "bl0"; zone "bl1"; zone "bl2"; zone "bl3"; zone "bl4";
-	zone "bl5"; zone "bl6"; zone "bl7"; zone "bl8"; zone "bl9";
-	zone "bl10"; zone "bl11"; zone "bl12"; zone "bl13"; zone "bl14";
-	zone "bl15"; zone "bl16"; zone "bl17"; zone "bl18"; zone "bl19";
+	zone "bl0"; zone "bl1"; zone "bl2";
     } recursive-only no
 	max-policy-ttl 90
 	# min-ns-dots 0
@@ -111,3 +110,5 @@ $PERL -e 'for ($cnt = $val = 1; $cnt <= 3000; ++$cnt) {
 	printf("host-%05d.example.tld5 A\n", $val);
 	$val = ($val * 9 + 32771) % 65536;
 	}' >ns5/requests
+
+cp ns2/bl.tld2.db.in ns2/bl.tld2.db

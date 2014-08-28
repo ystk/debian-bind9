@@ -3,8 +3,11 @@
 # This file must follow /bin/sh rules.  It is imported directly via
 # configure.
 #
+PRODUCT=BIND
+DESCRIPTION="(Extended Support Version)"
 MAJORVER=9
-MINORVER=8
-PATCHVER=4-rpz2+rl005.12
-RELEASETYPE=-P
-RELEASEVER=1
+MINORVER=9
+PATCHVER=5
+RELEASETYPE=
+RELEASEVER=
+EXTENSIONS="$(dpkg-parsechangelog | sed -n '/^Version/s/[^-]*//p')-$(dpkg-vendor --query Vendor)"

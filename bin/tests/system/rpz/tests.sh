@@ -12,6 +12,8 @@
 # OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 
+# $Id$
+
 
 # test response policy zones (RPZ)
 
@@ -27,6 +29,7 @@ ns5=$ns.5			    # check performance with this server
 
 HAVE_CORE=
 SAVE_RESULTS=
+NS3_STATS=47
 
 USAGE="$0: [-x]"
 while getopts "x" c; do
@@ -54,11 +57,13 @@ comment () {
 RNDCCMD="$RNDC -c $SYSTEMTESTTOP/common/rndc.conf -p 9953 -s"
 
 digcmd () {
-    digcmd_args="+noadd +time=1 +tries=1 -p 5300 $*"
-    expr "$digcmd_args" : '.*@' >/dev/null || \
-	digcmd_args="$digcmd_args @$ns3"
-    expr "$digcmd_args" : '.*+[no]*auth' >/dev/null || \
-	digcmd_args="+noauth $digcmd_args"
+    # Default to +noauth and @$ns3
+    # Also default to -bX where X is the @value so that OS X will choose
+    #      the right IP source address.
+    digcmd_args=`echo "+noadd +time=1 +tries=1 -p 5300 $*" |   \
+	   sed -e "/@/!s/.*/& @$ns3/"                          \
+	       -e '/-b/!s/@\([^ ]*\)/@\1 -b\1/'                \
+	       -e '/+n?o?auth/!s/.*/+noauth &/'`
     #echo I:dig $digcmd_args 1>&2
     $DIG $digcmd_args
 }
@@ -84,10 +89,10 @@ setret () {
 # (re)load the reponse policy zones with the rules in the file $TEST_FILE
 load_db () {
     if test -n "$TEST_FILE"; then
-	if ! $NSUPDATE -v $TEST_FILE; then
+	$NSUPDATE -v $TEST_FILE || {
 	    echo "I:failed to update policy zone with $TEST_FILE"
 	    exit 1
-	fi
+	}
     fi
 }
 
@@ -132,6 +137,7 @@ ckalive () {
 
 # check that statistics for $1 in $2 = $3
 ckstats () {
+    rm -f $2/named.stats
     $RNDCCMD $1 stats
     CNT=`sed -n -e 's/[	 ]*\([0-9]*\).response policy.*/\1/p'  \
 		    $2/named.stats`
@@ -306,6 +312,30 @@ addr 14.14.14.14 a5-4.tld2		# 13 prefer QNAME to IP
 nochange a5-4.tld2	    +norecurse	# 14 check that RD=1 is required
 nochange a4-4.tld2			# 15 PASSTHRU
 nxdomain c2.crash2.tld3			# 16 assert in rbtdb.c
+ckstats $ns3 ns3 29
+nxdomain a7-1.tld2			# 17 slave policy zone (RT34450)
+cp ns2/blv2.tld2.db.in ns2/bl.tld2.db
+$RNDCCMD 10.53.0.2 reload bl.tld2
+goodsoa="rpz.tld2. hostmaster.ns.tld2. 2 3600 1200 604800 60"
+for i in 0 1 2 3 4 5 6 7 8 9 10
+do
+	soa=`$DIG -p 5300 +short soa bl.tld2 @10.53.0.3 -b10.53.0.3`
+	test "$soa" = "$goodsoa" && break
+	sleep 1
+done
+nochange a7-1.tld2			# 18 PASSTHRU
+sleep 1	# ensure that a clock tick has occured so that the reload takes effect
+cp ns2/blv3.tld2.db.in ns2/bl.tld2.db
+goodsoa="rpz.tld2. hostmaster.ns.tld2. 3 3600 1200 604800 60"
+$RNDCCMD 10.53.0.2 reload bl.tld2
+for i in 0 1 2 3 4 5 6 7 8 9 10
+do
+	soa=`$DIG -p 5300 +short soa bl.tld2 @10.53.0.3 -b10.53.0.3`
+	test "$soa" = "$goodsoa" && break
+	sleep 1
+done
+nxdomain a7-1.tld2			# 19 slave policy zone (RT34450)
+ckstats $ns3 ns3 31
 end_group
 
 # check that IP addresses for previous group were deleted from the radix tree
@@ -339,8 +369,9 @@ if ./rpz nsdname; then
     addr 127.0.0.2 a3-1.subsub.sub3.tld2
     nxdomain xxx.crash1.tld2		# 12 dns_db_detachnode() crash
     end_group
+    NS3_STATS=`expr $NS3_STATS + 7`
 else
-    echo "I:NSDNAME not checked; named not configured with --enable-rpz-nsdname"
+    echo "I:NSDNAME not checked; named configured with --disable-rpz-nsdname"
 fi
 
 if ./rpz nsip; then
@@ -352,16 +383,17 @@ if ./rpz nsip; then
     nochange a3-1.tld4			# 4 different NS IP address
     end_group
 
-    start_group "walled garden NSIP rewrites" test4a
-    addr 41.41.41.41 a3-1.tld2		# 1 walled garden for all of tld2
-    addr 2041::41   'a3-1.tld2 AAAA'	# 2 walled garden for all of tld2
-    here a3-1.tld2 TXT <<'EOF'		# 3 text message for all of tld2
-    ;; status: NOERROR, x
-    a3-1.tld2.	    x	IN	TXT   "NSIP walled garden"
-EOF
-    end_group
+#    start_group "walled garden NSIP rewrites" test4a
+#    addr 41.41.41.41 a3-1.tld2		# 1 walled garden for all of tld2
+#    addr 2041::41   'a3-1.tld2 AAAA'	# 2 walled garden for all of tld2
+#    here a3-1.tld2 TXT <<'EOF'		# 3 text message for all of tld2
+#    ;; status: NOERROR, x
+#    a3-1.tld2.	    x	IN	TXT   "NSIP walled garden"
+#EOF
+#    end_group
+    NS3_STATS=`expr $NS3_STATS + 1`
 else
-    echo "I:NSIP not checked; named not configured with --enable-rpz-nsip"
+    echo "I:NSIP not checked; named configured with --disable-rpz-nsip"
 fi
 
 # policies in ./test5 overridden by response-policy{} in ns3/named.conf
@@ -458,8 +490,7 @@ else
     echo "I:performance not checked; queryperf not available"
 fi
 
-
-ckstats $ns3 ns3 58
+ckstats $ns3 ns3 57
 
 # restart the main test RPZ server to see if that creates a core file
 if test -z "$HAVE_CORE"; then
@@ -475,6 +506,11 @@ if test -n "$EMSGS"; then
     setret "I:error messages in $EMSGS starting with:"
     egrep 'invalid rpz|rpz.*failed' ns*/named.run | sed -e '10,$d' -e 's/^/I:  /'
 fi
+
+echo "I:checking that ttl values are not zeroed when qtype is '*'"
+$DIG +noall +answer -p 5300 @$ns3 any a3-2.tld2 > dig.out.any
+ttl=`awk '/a3-2 tld2 text/ {print $2}' dig.out.any`
+if test ${ttl:=0} -eq 0; then setret I:failed; fi
 
 echo "I:exit status: $status"
 exit $status

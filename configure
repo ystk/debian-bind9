@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2004-2012  Internet Systems Consortium, Inc. ("ISC")
+# Copyright (C) 2004-2014  Internet Systems Consortium, Inc. ("ISC")
 # Copyright (C) 1996-2003  Internet Software Consortium.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
@@ -14,510 +14,7 @@
 # OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 #
-# $Id: COPYRIGHT,v 1.17.14.2 2012/01/04 23:46:18 tbox Exp $
-#
-# 	Portions of this code release fall under one or more of the
-# 	following Copyright notices.  Please see individual source
-# 	files for details.
-#
-# 	For binary releases also see: OpenSSL-LICENSE.
-#
-# Copyright (C) 1996-2001  Nominum, Inc.
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND NOMINUM DISCLAIMS ALL WARRANTIES
-# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL NOMINUM BE LIABLE FOR
-# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
-# OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (C) 1995-2000 by Network Associates, Inc.
-#
-# Permission to use, copy, modify, and/or distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND ISC AND NETWORK ASSOCIATES DISCLAIMS
-# ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE
-# FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-# IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (C) 2002 Stichting NLnet, Netherlands, stichting@nlnet.nl.
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the
-# above copyright notice and this permission notice appear in all
-# copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND STICHTING NLNET
-# DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
-# STICHTING NLNET BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
-# CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
-# OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
-# OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
-# USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-# The development of Dynamically Loadable Zones (DLZ) for Bind 9 was
-# conceived and contributed by Rob Butler.
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the
-# above copyright notice and this permission notice appear in all
-# copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND ROB BUTLER
-# DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
-# ROB BUTLER BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
-# CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
-# OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
-# OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE
-# USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1987, 1990, 1993, 1994
-#      The Regents of the University of California.  All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. All advertising materials mentioning features or use of this software
-#    must display the following acknowledgement:
-#      This product includes software developed by the University of
-#      California, Berkeley and its contributors.
-# 4. Neither the name of the University nor the names of its contributors
-#    may be used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (C) The Internet Society 2005.  This version of
-# this module is part of RFC 4178; see the RFC itself for
-# full legal notices.
-#
-# (The above copyright notice is per RFC 3978 5.6 (a), q.v.)
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 2004 Masarykova universita
-# (Masaryk University, Brno, Czech Republic)
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# 1. Redistributions of source code must retain the above copyright notice,
-#    this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#
-# 3. Neither the name of the University nor the names of its contributors may
-#    be used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1997 - 2003 Kungliga Tekniska Högskolan
-# (Royal Institute of Technology, Stockholm, Sweden).
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#
-# 3. Neither the name of the Institute nor the names of its contributors
-#    may be used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1998 Doug Rabson
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright ((c)) 2002, Rice University
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are
-# met:
-#
-#     * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#
-#     * Redistributions in binary form must reproduce the above
-#     copyright notice, this list of conditions and the following
-#     disclaimer in the documentation and/or other materials provided
-#     with the distribution.
-#
-#     * Neither the name of Rice University (RICE) nor the names of its
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
-#
-#
-# This software is provided by RICE and the contributors on an "as is"
-# basis, without any representations or warranties of any kind, express
-# or implied including, but not limited to, representations or
-# warranties of non-infringement, merchantability or fitness for a
-# particular purpose. In no event shall RICE or contributors be liable
-# for any direct, indirect, incidental, special, exemplary, or
-# consequential damages (including, but not limited to, procurement of
-# substitute goods or services; loss of use, data, or profits; or
-# business interruption) however caused and on any theory of liability,
-# whether in contract, strict liability, or tort (including negligence
-# or otherwise) arising in any way out of the use of this software, even
-# if advised of the possibility of such damage.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1993 by Digital Equipment Corporation.
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies, and that
-# the name of Digital Equipment Corporation not be used in advertising or
-# publicity pertaining to distribution of the document or software without
-# specific, written prior permission.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND DIGITAL EQUIPMENT CORP. DISCLAIMS ALL
-# WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS.   IN NO EVENT SHALL DIGITAL EQUIPMENT
-# CORPORATION BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
-# DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-# PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-# ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
-# SOFTWARE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright 2000 Aaron D. Gifford.  All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. Neither the name of the copyright holder nor the names of contributors
-#    may be used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR(S) AND CONTRIBUTOR(S) ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR(S) OR CONTRIBUTOR(S) BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1998 Doug Rabson.
-# Copyright (c) 2001 Jake Burkholder.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-# 3. Neither the name of the project nor the names of its contributors
-#    may be used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-# SUCH DAMAGE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1999-2000 by Nortel Networks Corporation
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND NORTEL NETWORKS DISCLAIMS
-# ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
-# OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL NORTEL NETWORKS
-# BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES
-# OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
-# WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-# ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
-# SOFTWARE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 2000-2002 Japan Network Information Center.  All rights reserved.
-#
-# By using this file, you agree to the terms and conditions set forth bellow.
-#
-#                         LICENSE TERMS AND CONDITIONS
-#
-# The following License Terms and Conditions apply, unless a different
-# license is obtained from Japan Network Information Center ("JPNIC"),
-# a Japanese association, Kokusai-Kougyou-Kanda Bldg 6F, 2-3-4 Uchi-Kanda,
-# Chiyoda-ku, Tokyo 101-0047, Japan.
-#
-# 1. Use, Modification and Redistribution (including distribution of any
-#    modified or derived work) in source and/or binary forms is permitted
-#    under this License Terms and Conditions.
-#
-# 2. Redistribution of source code must retain the copyright notices as they
-#    appear in each source code file, this License Terms and Conditions.
-#
-# 3. Redistribution in binary form must reproduce the Copyright Notice,
-#    this License Terms and Conditions, in the documentation and/or other
-#    materials provided with the distribution.  For the purposes of binary
-#    distribution the "Copyright Notice" refers to the following language:
-#    "Copyright (c) 2000-2002 Japan Network Information Center.  All rights
-#    reserved."
-#
-# 4. The name of JPNIC may not be used to endorse or promote products
-#    derived from this Software without specific prior written approval of
-#    JPNIC.
-#
-# 5. Disclaimer/Limitation of Liability: THIS SOFTWARE IS PROVIDED BY JPNIC
-#    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-#    PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL JPNIC BE LIABLE
-#    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-#    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-#    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-#    BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-#    WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-#    OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-#    ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (C) 2004  Nominet, Ltd.
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND NOMINET DISCLAIMS ALL WARRANTIES WITH
-# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-# AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR ANY SPECIAL, DIRECT,
-# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
-# OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-# PERFORMANCE OF THIS SOFTWARE.
-#
-#  -----------------------------------------------------------------------------
-#
-# Portions Copyright RSA Security Inc.
-#
-# License to copy and use this software is granted provided that it is
-# identified as "RSA Security Inc. PKCS #11 Cryptographic Token Interface
-# (Cryptoki)" in all material mentioning or referencing this software.
-#
-# License is also granted to make and use derivative works provided that
-# such works are identified as "derived from the RSA Security Inc. PKCS #11
-# Cryptographic Token Interface (Cryptoki)" in all material mentioning or
-# referencing the derived work.
-#
-# RSA Security Inc. makes no representations concerning either the
-# merchantability of this software or the suitability of this software for
-# any particular purpose. It is provided "as is" without express or implied
-# warranty of any kind.
-#
-#  -----------------------------------------------------------------------------
-#
-# Copyright (c) 1996, David Mazieres <dm@uun.org>
-# Copyright (c) 2008, Damien Miller <djm@openbsd.org>
-#
-# Permission to use, copy, modify, and distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-#
-# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-#
-# -----------------------------------------------------------------------------
-#
-# Copyright (c) 2000-2001 The OpenSSL Project.  All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in
-#    the documentation and/or other materials provided with the
-#    distribution.
-#
-# 3. All advertising materials mentioning features or use of this
-#    software must display the following acknowledgment:
-#    "This product includes software developed by the OpenSSL Project
-#    for use in the OpenSSL Toolkit. (http://www.OpenSSL.org/)"
-#
-# 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
-#    endorse or promote products derived from this software without
-#    prior written permission. For written permission, please contact
-#    licensing@OpenSSL.org.
-#
-# 5. Products derived from this software may not be called "OpenSSL"
-#    nor may "OpenSSL" appear in their names without prior written
-#    permission of the OpenSSL Project.
-#
-# 6. Redistributions of any form whatsoever must retain the following
-#    acknowledgment:
-#    "This product includes software developed by the OpenSSL Project
-#    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"
-#
-# THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
-# EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-# PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
-# ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-# OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# From configure.in Revision: 1.512.8.15 .
+# From configure.in Revision: 1.533 .
 # Guess values for system-dependent variables and create Makefiles.
 # Generated by GNU Autoconf 2.69.
 #
@@ -1167,7 +664,10 @@ SO_LD
 SO_CFLAGS
 SO
 BIND9_CONFIGARGS
+BIND9_SRCID
 BIND9_VERSION
+BIND9_DESCRIPTION
+BIND9_PRODUCT
 BIND9_BIND9_BUILDINCLUDE
 BIND9_LWRES_BUILDINCLUDE
 BIND9_DNS_BUILDINCLUDE
@@ -1225,6 +725,8 @@ LWRES_PLATFORM_NEEDVSNPRINTF
 ISC_PLATFORM_NEEDVSNPRINTF
 LWRES_PLATFORM_NEEDSPRINTF
 ISC_PLATFORM_NEEDSPRINTF
+READLINE_LIB
+ISC_PLATFORM_NEEDSTRCASESTR
 ISC_PLATFORM_NEEDSTRLCAT
 ISC_PLATFORM_NEEDSTRLCPY
 GENRANDOMLIB
@@ -1318,6 +820,8 @@ OPENSSL_GOST
 OPENSSL_ECDSA
 OPENSSLLINKSRCS
 OPENSSLLINKOBJS
+OPENSSLGOSTLINKSRCS
+OPENSSLGOSTLINKOBJS
 DST_OPENSSL_INC
 USE_OPENSSL
 GEOIP_LIBS
@@ -1326,15 +830,22 @@ ISC_PLATFORM_NEEDSYSSELECTH
 ISC_PLATFORM_HAVEDEVPOLL
 ISC_PLATFORM_HAVEEPOLL
 ISC_PLATFORM_HAVEKQUEUE
+RRLLINKSRCS
+RRLLINKOBJS
 ISC_PLATFORM_HAVELIFCONF
 ISC_PLATFORM_NORETURN_POST
 ISC_PLATFORM_NORETURN_PRE
 ISC_PLATFORM_HAVELONGLONG
 ISC_SOCKADDR_LEN_T
+PYTHON_TOOLS
+COVERAGE
+CHECKDS
+PYTHON
 PERL
 ETAGS
 LN
 ARFLAGS
+CCNOOPT
 CCOPT
 STD_CWARNINGS
 STD_CDEFINES
@@ -1441,11 +952,15 @@ with_sysroot
 enable_libtool_lock
 enable_libbind
 enable_developer
+with_python
+enable_newstats
+enable_rrl
 enable_kqueue
 enable_epoll
 enable_devpoll
 with_openssl
 enable_openssl_version_check
+with_ecdsa
 with_gost
 with_geoip
 enable_openssl_hash
@@ -1465,6 +980,7 @@ with_export_includedir
 enable_ipv6
 with_kame
 enable_getifaddrs
+with_readline
 enable_isc_spnego
 enable_chroot
 enable_linux_caps
@@ -1489,6 +1005,7 @@ with_dlz_ldap
 with_dlz_odbc
 with_dlz_stub
 with_make_clean
+enable_full_report
 '
       ac_precious_vars='build_alias
 host_alias
@@ -2116,20 +1633,22 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-libbind	  deprecated
-  --enable-developer     enable developer build settings
+  --enable-developer      enable developer build settings
+  --enable-newstats       use the new statistics
+  --enable-rrl            use DNS Response Rate Limiting
   --enable-kqueue         use BSD kqueue when available [default=yes]
   --enable-epoll          use Linux epoll when available [default=auto]
   --enable-devpoll        use /dev/poll when available [default=yes]
   --enable-openssl-version-check
                           Check OpenSSL Version [default=yes]
   --enable-openssl-hash   use OpenSSL for hash functions [default=no]
-  --enable-threads	enable multithreading
+  --enable-threads        enable multithreading
   --enable-largefile	  64-bit file support
   --enable-backtrace      log stack backtrace on abort [default=yes]
   --enable-symtable       use internal symbol table for backtrace
                           [all|minimal(default)|none]
-  --enable-exportlib	build exportable library (GNU make required)
-                        [default=no]
+  --enable-exportlib	  build exportable library (GNU make required)
+                          [default=no]
   --enable-ipv6           use IPv6 default=autodetect
   --enable-getifaddrs     Enable the use of getifaddrs() [yes|no].
   --disable-isc-spnego    use SPNEGO from GSSAPI library
@@ -2139,10 +1658,11 @@ Optional Features:
 			  [default=autodetect]
   --enable-fixed-rrset    enable fixed rrset ordering
 			  [default=no]
-  --enable-rpz-nsip	  enable rpz-nsip rules [default=no]
-  --enable-rpz-nsdname	  enable rpz-nsdname rules [default=no]
+  --disable-rpz-nsip	  disable rpz-nsip rules [default=enabled]
+  --disable-rpz-nsdname	  disable rpz-nsdname rules [default=enabled]
   --enable-filter-aaaa    enable filtering of AAAA records over IPv4
 			  [default=no]
+  --enable-full-report	  report values of all configure options
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2152,9 +1672,11 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
+  --with-python=PATH      Specify path to python interpreter
   --with-openssl=PATH     Build with OpenSSL yes|no|path.
 			  (Required for DNSSEC)
-
+  --with-ecdsa            OpenSSL ECDSA
+  --with-gost             OpenSSL GOST
   --with-geoip=PATH   Specify path for system-supplied GeoIP
   --with-pkcs11=PATH      Build with PKCS11 support yes|no|path
                           (PATH is for the PKCS11 provider)
@@ -2164,18 +1686,20 @@ Optional Packages:
   --with-purify=PATH      use Rational purify
   --with-libtool          use GNU libtool
   --with-export-libdir=PATH
-                        installation directory for the export library
-                        [EPREFIX/lib/bind9]
+                          installation directory for the export library
+                          [EPREFIX/lib/bind9]
   --with-export-includedir=PATH
-                        installation directory for the header files of the
-                        export library [PREFIX/include/bind9]
+                          installation directory for the header files of the
+                          export library [PREFIX/include/bind9]
   --with-kame=PATH	  use Kame IPv6 default path /usr/local/v6
+  --with-readline=LIBSPEC    specify readline library default -lreadline
+
   --with-docbook-xsl=PATH Specify path for Docbook-XSL stylesheets
   --with-idn=MPREFIX      enable IDN support using idnkit default PREFIX
   --with-libiconv=IPREFIX GNU libiconv are in IPREFIX default PREFIX
   --with-iconv=LIBSPEC    specify iconv library default -liconv
   --with-idnlib=ARG       specify libidnkit
-  --with-atf=ARG       Automated Test Framework support
+  --with-atf=ARG          Automated Test Framework support
   --with-dlopen=ARG       Support dynamically loadable DLZ drivers
   --with-dlz-postgres=PATH   Build with Postgres DLZ driver yes|no|path.
                                (Required to use Postgres with DLZ)
@@ -3222,6 +2746,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 ac_config_headers="$ac_config_headers config.h"
+
 
 
 ac_aux_dir=
@@ -6536,7 +6061,7 @@ ia64-*-hpux*)
   rm -rf conftest*
   ;;
 
-x86_64-*kfreebsd*-gnu|x86_64-*linux*|ppc*-*linux*|powerpc*-*linux*| \
+x86_64-*kfreebsd*-gnu|x86_64-*linux*|powerpc*-*linux*| \
 s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
   # Find out which ABI we are using.
   echo 'int i;' > conftest.$ac_ext
@@ -6561,7 +6086,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 		;;
 	    esac
 	    ;;
-	  ppc64-*linux*|powerpc64-*linux*)
+	  powerpc64le-*)
+	    LD="${LD-ld} -m elf32lppclinux"
+	    ;;
+	  powerpc64-*)
 	    LD="${LD-ld} -m elf32ppclinux"
 	    ;;
 	  s390x-*linux*)
@@ -6580,7 +6108,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  ppc*-*linux*|powerpc*-*linux*)
+	  powerpcle-*)
+	    LD="${LD-ld} -m elf64lppc"
+	    ;;
+	  powerpc-*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)
@@ -8172,6 +7703,10 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -11826,6 +11361,7 @@ fi
 
 
 
+
 # Warn if the user specified libbind, which is now deprecated
 # Check whether --enable-libbind was given.
 if test "${enable_libbind+set}" = set; then :
@@ -11849,11 +11385,11 @@ fi
 
 case "$enable_developer" in
 yes)
+	STD_CDEFINES="$STD_CDEFINES -DISC_LIST_CHECKINIT=1"
 	test "${enable_fixed_rrset+set}" = set || enable_fixed_rrset=yes
 	test "${with_atf+set}" = set || with_atf=yes
 	test "${enable_filter_aaaa+set}" = set || enable_filter_aaaa=yes
-	test "${enable_rpz_nsip+set}" = set || enable_rpz_nsip=yes
-	test "${enable_rpz_nsdname+set}" = set || enable_rpz_nsdname=yes
+	test "${enable_rrl+set}" = set || enable_rrl=yes
 	test "${with_dlz_filesystem+set}" = set || with_dlz_filesystem=yes
 	case "$host" in
 	*-darwin*)
@@ -11863,6 +11399,7 @@ yes)
 		test "${enable_exportlib+set}" = set || enable_exportlib=yes
 		;;
 	esac
+	test "${enable_symtable+set}" = set || enable_symtable=all
 	;;
 esac
 #
@@ -12048,6 +11585,172 @@ fi
 
   test -n "$PERL" && break
 done
+
+
+
+#
+# Python is also optional; it is used by the tools in bin/python.
+# If python is unavailable, we simply don't build those.
+#
+
+# Check whether --with-python was given.
+if test "${with_python+set}" = set; then :
+  withval=$with_python; use_python="$withval"
+else
+  use_python="unspec"
+fi
+
+
+case "$use_python" in
+	no)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+$as_echo "disabled" >&6; }
+		;;
+	unspec|yes|*)
+		case "$use_python" in
+		unspec|yes|'')
+			for ac_prog in python
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PYTHON+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PYTHON in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PYTHON="$PYTHON" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PYTHON="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+PYTHON=$ac_cv_path_PYTHON
+if test -n "$PYTHON"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PYTHON" >&5
+$as_echo "$PYTHON" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$PYTHON" && break
+done
+
+			;;
+		*)
+			for ac_prog in $use_python
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PYTHON+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PYTHON in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PYTHON="$PYTHON" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PYTHON="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+PYTHON=$ac_cv_path_PYTHON
+if test -n "$PYTHON"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PYTHON" >&5
+$as_echo "$PYTHON" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$PYTHON" && break
+done
+
+			;;
+		esac
+		if test "X$PYTHON" == "X"
+		then
+			case "$use_python" in
+			unspec)
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: disabled" >&5
+$as_echo "disabled" >&6; }
+				;;
+			yes|*)
+				as_fn_error $? "missing python" "$LINENO" 5
+				;;
+			esac
+			break
+		fi
+                testscript='try: import argparse
+except: exit(1)'
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking python module 'argparse'" >&5
+$as_echo_n "checking python module 'argparse'... " >&6; }
+                if $PYTHON -c "$testscript"; then
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: found, using $PYTHON" >&5
+$as_echo "found, using $PYTHON" >&6; }
+                else
+			case "$use_python" in
+			unspec)
+				PYTHON=""
+
+
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: not found, python disabled" >&5
+$as_echo "not found, python disabled" >&6; }
+				;;
+			yes)
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no found" >&5
+$as_echo "no found" >&6; }
+                        as_fn_error $? "python 'argparse' module not supported" "$LINENO" 5
+				;;
+			esac
+                fi
+		;;
+esac
+
+PYTHON_TOOLS=''
+CHECKDS=''
+COVERAGE=''
+if test "X$PYTHON" != "X"; then
+        PYTHON_TOOLS=python
+	CHECKDS=checkds
+	COVERAGE=coverage
+fi
+
 
 
 
@@ -12735,7 +12438,7 @@ case "$host" in
 	# as it breaks how the two halves (Basic and Advanced) of the IPv6
 	# Socket API were designed to be used but we have to live with it.
 	# Define _GNU_SOURCE to pull in the IPv6 Advanced Socket API.
-	*-linux* | *-*-gnu)
+	*-linux*|*-gnu*)
 		STD_CDEFINES="$STD_CDEFINES -D_GNU_SOURCE"
 		CPPFLAGS="$CPPFLAGS -D_GNU_SOURCE"
 		;;
@@ -12748,6 +12451,13 @@ case "$host" in
 	  CPPFLAGS="$CPPFLAGS -D__APPLE_USE_RFC_3542"
 	  ;;
 esac
+
+#
+# CCNOOPT defaults to -O0 on gcc and disables optimization when is last
+#
+if test "X$CCNOOPT" = "X" -a "X$GCC" = "Xyes"; then
+	CCNOOPT="-O0"
+fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ANSI C header files" >&5
 $as_echo_n "checking for ANSI C header files... " >&6; }
@@ -12862,7 +12572,7 @@ $as_echo "#define STDC_HEADERS 1" >>confdefs.h
 fi
 
 
-for ac_header in fcntl.h sys/time.h unistd.h sys/sockio.h sys/select.h sys/param.h sys/sysctl.h net/if6.h
+for ac_header in fcntl.h regex.h sys/time.h unistd.h sys/sockio.h sys/select.h sys/param.h sys/sysctl.h net/if6.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default
@@ -13124,20 +12834,18 @@ $as_echo_n "checking for static inline breakage... " >&6; }
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-int
-main ()
-{
-
-		foo1();
-	}
-
 	static inline int foo1() {
 		return 0;
 	}
 
 	static inline int foo2() {
 		return foo1();
+	}
 
+int
+main ()
+{
+foo1();
   ;
   return 0;
 }
@@ -13352,6 +13060,48 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
 #
+# check if we want the new statistics
+#
+# Check whether --enable-newstats was given.
+if test "${enable_newstats+set}" = set; then :
+  enableval=$enable_newstats;
+fi
+
+case "$enable_newstats" in
+yes)
+
+$as_echo "#define NEWSTATS 1" >>confdefs.h
+
+	;;
+*)
+	;;
+esac
+
+#
+# check if we want DNS RRL
+#
+# Check whether --enable-rrl was given.
+if test "${enable_rrl+set}" = set; then :
+  enableval=$enable_rrl;
+fi
+
+case "$enable_rrl" in
+yes)
+
+$as_echo "#define USE_RRL 1" >>confdefs.h
+
+        RRLLINKOBJS='${RRLOBJS}'
+        RRLLINKSRCS='${RRLSRCS}'
+	;;
+*)
+        RRLLINKOBJS=""
+        RRLLINKSRCS=""
+	;;
+esac
+
+
+
+#
 # check if we have kqueue
 #
 # Check whether --enable-kqueue was given.
@@ -13401,10 +13151,9 @@ auto)
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking epoll support" >&5
 $as_echo_n "checking epoll support... " >&6; }
 	if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	ISC_PLATFORM_HAVEEPOLL="#undef ISC_PLATFORM_HAVEEPOLL"
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -13795,12 +13544,16 @@ case "$use_openssl" in
 $as_echo "no" >&6; }
 		DST_OPENSSL_INC=""
 		USE_OPENSSL=""
+		OPENSSLGOSTLINKOBJS=""
+		OPENSSLGOSTLINKSRS=""
 		OPENSSLLINKOBJS=""
 		OPENSSLLINKSRCS=""
 		;;
 	auto)
 		DST_OPENSSL_INC=""
 		USE_OPENSSL=""
+		OPENSSLGOSTLINKOBJS=""
+		OPENSSLGOSTLINKSRS=""
 		OPENSSLLINKOBJS=""
 		OPENSSLLINKSRCS=""
 		as_fn_error $? "OpenSSL was not found in any of $openssldirs; use --with-openssl=/path
@@ -14001,20 +13754,20 @@ $as_echo "Skipped OpenSSL version check" >&6; }
 ;;
 esac
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL DSA support" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL DSA support" >&5
 $as_echo_n "checking for OpenSSL DSA support... " >&6; }
-		if test -f $use_openssl/include/openssl/dsa.h
-		then
-			$as_echo "#define HAVE_OPENSSL_DSA 1" >>confdefs.h
+        if test -f $use_openssl/include/openssl/dsa.h
+        then
+                $as_echo "#define HAVE_OPENSSL_DSA 1" >>confdefs.h
 
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+        else
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-		fi
+        fi
 
-		for ac_func in EVP_sha256 EVP_sha384 EVP_sha512
+        for ac_func in EVP_sha256 EVP_sha384 EVP_sha512
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -14027,14 +13780,12 @@ fi
 done
 
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL ECDSA support" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL ECDSA support" >&5
 $as_echo_n "checking for OpenSSL ECDSA support... " >&6; }
-		have_ecdsa=""
-		if test "$cross_compiling" = yes; then :
-  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
-$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
-as_fn_error $? "cannot run test program while cross compiling
-See \`config.log' for more details" "$LINENO" 5; }
+        have_ecdsa=""
+        if test "$cross_compiling" = yes; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: using --with-ecdsa" >&5
+$as_echo "using --with-ecdsa" >&6; }
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -14059,30 +13810,55 @@ _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-		have_ecdsa="yes"
+        have_ecdsa="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-		have_ecdsa="no"
+        have_ecdsa="no"
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
-		case $have_ecdsa in
-		yes)
-			OPENSSL_ECDSA="yes"
-			$as_echo "#define HAVE_OPENSSL_ECDSA 1" >>confdefs.h
 
-			;;
-		*)
-			;;
-		esac
+# Check whether --with-ecdsa was given.
+if test "${with_ecdsa+set}" = set; then :
+  withval=$with_ecdsa; with_ecdsa="$withval"
+else
+  with_ecdsa="auto"
+fi
 
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL GOST support" >&5
+        case "$with_ecdsa" in
+        yes)
+            case "$have_ecdsa" in
+            no)  as_fn_error $? "ecdsa not supported" "$LINENO" 5 ;;
+            *)  have_ecdsa=yes ;;
+            esac
+            ;;
+        no)
+            have_ecdsa=no ;;
+        *)
+            case "$have_ecdsa" in
+            yes|no) ;;
+            *) as_fn_error $? "need --with-ecdsa=[yes or no]" "$LINENO" 5 ;;
+            esac
+            ;;
+        esac
+        case $have_ecdsa in
+        yes)
+                OPENSSL_ECDSA="yes"
+
+$as_echo "#define HAVE_OPENSSL_ECDSA 1" >>confdefs.h
+
+                ;;
+        *)
+                ;;
+        esac
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OpenSSL GOST support" >&5
 $as_echo_n "checking for OpenSSL GOST support... " >&6; }
-		have_gost=""
-		if test "$cross_compiling" = yes; then :
+        have_gost=""
+        if test "$cross_compiling" = yes; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: using --with-gost" >&5
 $as_echo "using --with-gost" >&6; }
 else
@@ -14114,11 +13890,11 @@ _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-		have_gost="yes"
+        have_gost="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-		have_gost="no"
+        have_gost="no"
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
@@ -14132,38 +13908,40 @@ else
   with_gost="auto"
 fi
 
-		case "$with_gost" in
-		yes)
-		    case "$have_gost" in
-		    no)  as_fn_error $? "gost not supported" "$LINENO" 5 ;;
-		    *)  have_gost=yes ;;
-		    esac
-		    ;;
-		no)
-		    have_gost=no ;;
-		*)
-		    case "$have_gost" in
-		    yes|no) ;;
-		    *) as_fn_error $? "need --with-gost=[yes or no]" "$LINENO" 5 ;;
-		    esac
-		    ;;
-		esac
-		case $have_gost in
-		yes)
-			OPENSSL_GOST="yes"
+        case "$with_gost" in
+        yes)
+            case "$have_gost" in
+            no)  as_fn_error $? "gost not supported" "$LINENO" 5 ;;
+            *)  have_gost=yes ;;
+            esac
+            ;;
+        no)
+            have_gost=no ;;
+        *)
+            case "$have_gost" in
+            yes|no) ;;
+            *) as_fn_error $? "need --with-gost=[yes or no]" "$LINENO" 5 ;;
+            esac
+            ;;
+        esac
+        case $have_gost in
+        yes)
+		OPENSSL_GOST="yes"
+		OPENSSLGOSTLINKOBJS='${OPENSSLGOSTLINKOBJS}'
+		OPENSSLGOSTLINKSRCS='${OPENSSLGOSTLINKSRCS}'
 
 $as_echo "#define HAVE_OPENSSL_GOST 1" >>confdefs.h
 
-			;;
-		*)
-			;;
-		esac
-		CFLAGS="$saved_cflags"
-		LIBS="$saved_libs"
-		OPENSSLLINKOBJS='${OPENSSLLINKOBJS}'
-		OPENSSLLINKSRCS='${OPENSSLLINKSRCS}'
-
 		;;
+        *)
+                ;;
+        esac
+        CFLAGS="$saved_cflags"
+        LIBS="$saved_libs"
+        OPENSSLLINKOBJS='${OPENSSLLINKOBJS}'
+        OPENSSLLINKSRCS='${OPENSSLLINKSRCS}'
+
+        ;;
 esac
 
 #
@@ -14311,6 +14089,8 @@ esac
 # This would include the system openssl path (and linker options to use
 # it as needed) if it is found.
 #
+
+
 
 
 
@@ -14540,6 +14320,7 @@ done
 		    "-lgssapi" \
 		    "-lgssapi -lkrb5 -ldes -lcrypt -lasn1 -lroken -lcom_err" \
 		    "-lgssapi -lkrb5 -lcrypto -lcrypt -lasn1 -lroken -lcom_err" \
+		    "-lgssapi -lkrb5 -lhx509 -lcrypto -lcrypt -lasn1 -lroken -lcom_err" \
 		    "-lgss -lkrb5"
 		do
 		    # Note that this does not include $saved_libs, because
@@ -14666,6 +14447,12 @@ fi
 
 case "$use_randomdev" in
 	unspec)
+		case "$cross_compiling" in
+		yes)
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: unspecified" >&5
+$as_echo "unspecified" >&6; }
+			as_fn_error $? " need --with-randomdev=PATH or --with-randomdev=no" "$LINENO" 5
+		esac
 		case "$host" in
 			*-openbsd*)
 				devrandom=/dev/arandom
@@ -14699,6 +14486,7 @@ if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 _ACEOF
 
 fi
+
 
 		;;
 	yes)
@@ -14774,8 +14562,13 @@ case $host in
 	# OpenBSD users have reported that named dumps core on
 	# startup when built with threads.
 	use_threads=false ;;
-*-freebsd*)
+*-freebsd[1234567].*)
+	# Threads are broken at least up to FreeBSD 4.11.
+	# FreeBSD 5, 6 and 7 we have never officially supported threads
+	# on. YMMV
 	use_threads=false ;;
+*-freebsd*)
+	use_threads=true ;;
 *-bsdi[234]*)
 	# Thread signals do not work reliably on some versions of BSD/OS.
 	use_threads=false ;;
@@ -14786,6 +14579,10 @@ case $host in
 	# Linux kernels produce unusable core dumps from multithreaded
 	# programs, and because of limitations in setuid().
 	use_threads=false ;;
+*-darwin[123456789].*)
+	use_threads=false ;;
+*-darwin*.*)
+	use_threads=true ;;
 *)
 	use_threads=false ;;
 esac
@@ -15290,11 +15087,13 @@ then
 		*-freebsd*)
 			CC="$CC -pthread"
 			CCOPT="$CCOPT -pthread"
+			CCNOOPT="$CCNOOPT -pthread"
 			STD_CDEFINES="$STD_CDEFINES -D_THREAD_SAFE"
 			;;
 		*-openbsd*)
 			CC="$CC -pthread"
 			CCOPT="$CCOPT -pthread"
+			CCNOOPT="$CCNOOPT -pthread"
 			;;
 		*-solaris*)
 			LIBS="$LIBS -lthread"
@@ -15308,10 +15107,12 @@ then
 		*-dec-osf*)
 			CC="$CC -pthread"
 			CCOPT="$CCOPT -pthread"
+			CCNOOPT="$CCNOOPT -pthread"
 			;;
 		*-solaris*)
 			CC="$CC -mt"
 			CCOPT="$CCOPT -mt"
+			CCNOOPT="$CCNOOPT -mt"
 			;;
 		*-ibm-aix*)
 			STD_CDEFINES="$STD_CDEFINES -D_THREAD_SAFE"
@@ -15319,10 +15120,12 @@ then
 		*-sco-sysv*uw*|*-*-sysv*UnixWare*)
 			CC="$CC -Kthread"
 			CCOPT="$CCOPT -Kthread"
+			CCNOOPT="$CCNOOPT -Kthread"
 			;;
 		*-*-sysv*OpenUNIX*)
 			CC="$CC -Kpthread"
 			CCOPT="$CCOPT -Kpthread"
+			CCNOOPT="$CCNOOPT -Kpthread"
 			;;
 		esac
 	fi
@@ -15481,6 +15284,82 @@ if test "x$ac_cv_func_pthread_attr_setstacksize" = xyes; then :
 fi
 
 
+	for ac_header in sched.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sched.h" "ac_cv_header_sched_h" "$ac_includes_default"
+if test "x$ac_cv_header_sched_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SCHED_H 1
+_ACEOF
+
+fi
+
+done
+
+
+	case "$host" in
+	*solaris-*)
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sched_yield in -lrt" >&5
+$as_echo_n "checking for sched_yield in -lrt... " >&6; }
+if ${ac_cv_lib_rt_sched_yield+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lrt  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char sched_yield ();
+int
+main ()
+{
+return sched_yield ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_rt_sched_yield=yes
+else
+  ac_cv_lib_rt_sched_yield=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_rt_sched_yield" >&5
+$as_echo "$ac_cv_lib_rt_sched_yield" >&6; }
+if test "x$ac_cv_lib_rt_sched_yield" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBRT 1
+_ACEOF
+
+  LIBS="-lrt $LIBS"
+
+fi
+
+		;;
+	esac
+
+	for ac_func in sched_yield pthread_yield pthread_yield_np
+do :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
+
+
 	#
 	# Additional OS-specific issues related to pthreads and sigwait.
 	#
@@ -15627,7 +15506,7 @@ case "$use_libxml2" in
 		;;
 	auto|yes)
 		case X`(xml2-config --version) 2>/dev/null` in
-		X2.[678].*)
+		X2.[6789].*)
 			libxml2_libs=`xml2-config --libs`
 			libxml2_cflags=`xml2-config --cflags`
 			;;
@@ -15810,6 +15689,7 @@ else
 	*-dec-osf*)
 		CC="$CC -std"
 		CCOPT="$CCOPT -std"
+		CCNOOPT="$CCNOOPT -std"
 		MKDEPCC="$CC"
 		;;
 	*-hp-hpux*)
@@ -15828,6 +15708,7 @@ else
 			;;
 		esac
 		CCOPT="$CCOPT -Ae -z"
+		CCNOOPT="$CCNOOPT -Ae -z"
 		LDFLAGS="-Wl,+vnocompatwarnings $LDFLAGS"
 		MKDEPPROG='cc -Ae -E -Wp,-M >/dev/null 2>>$TMP'
 		;;
@@ -17390,6 +17271,52 @@ fi
 
 
 
+ac_fn_c_check_func "$LINENO" "strcasestr" "ac_cv_func_strcasestr"
+if test "x$ac_cv_func_strcasestr" = xyes; then :
+  ISC_PLATFORM_NEEDSTRCASESTR="#undef ISC_PLATFORM_NEEDSTRCASESTR"
+else
+  ISC_PLATFORM_NEEDSTRCASESTR="#define ISC_PLATFORM_NEEDSTRCASESTR 1"
+fi
+
+
+
+
+
+# Check whether --with-readline was given.
+if test "${with_readline+set}" = set; then :
+  withval=$with_readline; readline="$withval"
+else
+  readline="-lreadline"
+fi
+
+case "$readline" in
+no)	;;
+*)
+	if test "x$readline" = "xyes"
+	then
+		readline=-lreadline
+	fi
+	saved_LIBS="$LIBS"
+	LIBS="$readline"
+	for ac_func in readline
+do :
+  ac_fn_c_check_func "$LINENO" "readline" "ac_cv_func_readline"
+if test "x$ac_cv_func_readline" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_READLINE 1
+_ACEOF
+
+fi
+done
+
+	if test "$ac_cv_func_readline" = "yes"
+	then
+		READLINE_LIB="$readline"
+	fi
+	LIBS="$saved_LIBS"
+        ;;
+esac
+
 ISC_PRINT_OBJS=
 ISC_PRINT_SRCS=
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking sprintf" >&5
@@ -17567,13 +17494,40 @@ fi
 
 case "$enable_linux_caps" in
 	yes|'')
-		for ac_header in linux/capability.h sys/capability.h
+		for ac_header in linux/types.h
 do :
-  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "linux/types.h" "ac_cv_header_linux_types_h" "$ac_includes_default"
+if test "x$ac_cv_header_linux_types_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+#define HAVE_LINUX_TYPES_H 1
+_ACEOF
+
+fi
+
+done
+
+		for ac_header in sys/capability.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/capability.h" "ac_cv_header_sys_capability_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_capability_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_CAPABILITY_H 1
+_ACEOF
+
+fi
+
+done
+
+		for ac_header in linux/capability.h
+do :
+  ac_fn_c_check_header_compile "$LINENO" "linux/capability.h" "ac_cv_header_linux_capability_h" "#ifdef HAVE_LINUX_TYPES_H
+				  #include <linux/types.h>
+				  #endif
+
+"
+if test "x$ac_cv_header_linux_capability_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LINUX_CAPABILITY_H 1
 _ACEOF
 
 fi
@@ -18096,12 +18050,13 @@ yes)
 esac
 
 
-for ac_func in nanosleep
+for ac_func in nanosleep usleep
 do :
-  ac_fn_c_check_func "$LINENO" "nanosleep" "ac_cv_func_nanosleep"
-if test "x$ac_cv_func_nanosleep" = xyes; then :
+  as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
+ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
+if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_NANOSLEEP 1
+#define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
 _ACEOF
 
 fi
@@ -18481,7 +18436,7 @@ esac
 if test "${enable_rpz_nsip+set}" = set; then :
   enableval=$enable_rpz_nsip; enable_nsip="$enableval"
 else
-  enable_nsip="no"
+  enable_nsip="yes"
 fi
 
 case "$enable_nsip" in
@@ -18503,7 +18458,7 @@ esac
 if test "${enable_rpz_nsdname+set}" = set; then :
   enableval=$enable_rpz_nsdname; enable_nsdname="$enableval"
 else
-  enable_nsdname="no"
+  enable_nsdname="yes"
 fi
 
 case "$enable_nsdname" in
@@ -18906,7 +18861,7 @@ case "$docbook_path" in
 auto)
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: auto" >&5
 $as_echo "auto" >&6; }
-	docbook_xsl_trees="/usr/pkg/share/xsl/docbook /usr/local/share/xsl/docbook /usr/share/xsl/docbook"
+	docbook_xsl_trees="/usr/pkg/share/xsl/docbook /usr/local/share/xsl/docbook /usr/share/xsl/docbook /opt/local/share/xsl/docbook-xsl"
 	;;
 *)
 	docbook_xsl_trees="$withval"
@@ -19311,6 +19266,9 @@ $as_echo "#define ATF_TEST 1" >>confdefs.h
 	STD_CINCLUDES="$STD_CINCLUDES -I$atf/include"
 	ATFBIN="$atf/bin"
 	ATFLIBS="-L$atf/lib -latf-c"
+	if test "$want_openssl_hash" = yes; then
+		ATFLIBS="-L$atf/lib -latf-c $DNS_CRYPTO_LIBS"
+	fi
 	UNITTESTS=tests
 fi
 
@@ -19375,8 +19333,22 @@ BIND9_MAKE_INCLUDES=$BIND9_TOP_BUILDDIR/make/includes
 
 BIND9_MAKE_RULES=$BIND9_TOP_BUILDDIR/make/rules
 
-. $srcdir/version
-BIND9_VERSION="VERSION=${MAJORVER}.${MINORVER}${PATCHVER:+.}${PATCHVER}${RELEASETYPE}${RELEASEVER}"
+. "$srcdir/version"
+BIND9_PRODUCT="PRODUCT=\"${PRODUCT}\""
+
+BIND9_DESCRIPTION="DESCRIPTION=\"${DESCRIPTION}\""
+
+BIND9_VERSION="VERSION=${MAJORVER}.${MINORVER}${PATCHVER:+.}${PATCHVER}${RELEASETYPE}${RELEASEVER}${EXTENSIONS}"
+
+
+BIND9_SRCID="SRCID=unset"
+if test -f "${srcdir}/srcid"; then
+	. "${srcdir}/srcid"
+	BIND9_SRCID="SRCID=$SRCID"
+elif test -d "${srcdir}/.git"; then
+	BIND9_SRCID="SRCID="`(cd "${srcdir}";git log -n 1 --format=%h)`
+fi
+
 
 
 if test -z "$ac_configure_args"; then
@@ -19392,25 +19364,25 @@ BIND9_CONFIGARGS="CONFIGARGS=${BIND9_CONFIGARGS}"
 
 
 
-LIBISC_API=$srcdir/lib/isc/api
+LIBISC_API="$srcdir/lib/isc/api"
 
 
-LIBISCCC_API=$srcdir/lib/isccc/api
+LIBISCCC_API="$srcdir/lib/isccc/api"
 
 
-LIBISCCFG_API=$srcdir/lib/isccfg/api
+LIBISCCFG_API="$srcdir/lib/isccfg/api"
 
 
-LIBDNS_API=$srcdir/lib/dns/api
+LIBDNS_API="$srcdir/lib/dns/api"
 
 
-LIBBIND9_API=$srcdir/lib/bind9/api
+LIBBIND9_API="$srcdir/lib/bind9/api"
 
 
-LIBLWRES_API=$srcdir/lib/lwres/api
+LIBLWRES_API="$srcdir/lib/lwres/api"
 
 
-LIBIRS_API=$srcdir/lib/irs/api
+LIBIRS_API="$srcdir/lib/irs/api"
 
 #
 # Configure any DLZ drivers.
@@ -19451,6 +19423,11 @@ else
   dlopen="yes"
 fi
 
+
+case $host in
+	*-sunos*) dlopen="no"
+		;;
+esac
 
 if test "$dlopen" = "yes"; then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
@@ -19516,11 +19493,15 @@ fi
 
 if test "$dlopen" = "yes"; then
 	case $host in
-		*-linux*)
+		*-linux*|*-gnu)
 			SO_CFLAGS="-fPIC"
 			if test "$have_dl" = "yes"
 			then
-				SO_LD="${CC} -shared"
+				if test "$use_libtool" = "yes"; then
+					SO_LD="${CC} -Xcompiler -shared"
+				else
+					SO_LD="${CC} -shared"
+				fi
 			else
 				SO_LD="ld -shared"
 			fi
@@ -19910,7 +19891,7 @@ $as_echo "not found" >&6; }
 			# Look for libname other than libdb.so.
 			# Order is important (sigh).
 
-			bdb_libnames="db-5.1 db-4.8 db-4.6 db42 db-4.2 db41 db-4.1 db"
+			bdb_libnames="db48 db-4.8 db47 db-4.7 db46 db-4.6 db45 db-4.5 db44 db-4.4 db43 db-4.3 db42 db-4.2 db41 db-4.1 db"
 			for d in $bdb_libnames
 			do
 				if test -f "$dd/lib/lib${d}.so"
@@ -19918,18 +19899,6 @@ $as_echo "not found" >&6; }
 					if test "$dd" != "/usr"
 					then
 						dlz_bdb_libs="-L${dd}/lib "
-					else
-						dlz_bdb_libs=""
-					fi
-					dlz_bdb_libs="${dlz_bdb_libs}-l${d}"
-					break
-				fi
-				# Also try the multiarch path
-				if test -f "$dd/lib/${DEB_HOST_MULTIARCH}/lib${d}.so"
-				then
-					if test "$dd" != "/usr"
-					then
-						dlz_bdb_libs="-L${dd}/lib/${DEB_HOST_MULTIARCH} "
 					else
 						dlz_bdb_libs=""
 					fi
@@ -20378,7 +20347,7 @@ ac_config_commands="$ac_config_commands chmod"
 # elsewhere if there's a good reason for doing so.
 #
 
-ac_config_files="$ac_config_files make/Makefile make/mkdep Makefile bin/Makefile bin/check/Makefile bin/confgen/Makefile bin/confgen/unix/Makefile bin/dig/Makefile bin/dnssec/Makefile bin/named/Makefile bin/named/unix/Makefile bin/nsupdate/Makefile bin/pkcs11/Makefile bin/rndc/Makefile bin/tests/Makefile bin/tests/atomic/Makefile bin/tests/db/Makefile bin/tests/dst/Makefile bin/tests/hashes/Makefile bin/tests/headerdep_test.sh bin/tests/master/Makefile bin/tests/mem/Makefile bin/tests/names/Makefile bin/tests/net/Makefile bin/tests/rbt/Makefile bin/tests/resolver/Makefile bin/tests/sockaddr/Makefile bin/tests/system/Makefile bin/tests/system/conf.sh bin/tests/system/dlz/prereq.sh bin/tests/system/dlzexternal/Makefile bin/tests/system/dlzexternal/ns1/named.conf bin/tests/system/ecdsa/prereq.sh bin/tests/system/filter-aaaa/Makefile bin/tests/system/gost/prereq.sh bin/tests/system/lwresd/Makefile bin/tests/system/rpz/Makefile bin/tests/system/tkey/Makefile bin/tests/system/tsiggss/Makefile bin/tests/tasks/Makefile bin/tests/timers/Makefile bin/tests/virtual-time/Makefile bin/tests/virtual-time/conf.sh bin/tools/Makefile contrib/check-secure-delegation.pl contrib/zone-edit.sh doc/Makefile doc/arm/Makefile doc/doxygen/Doxyfile doc/doxygen/Makefile doc/doxygen/doxygen-input-filter doc/misc/Makefile doc/xsl/Makefile doc/xsl/isc-docbook-chunk.xsl doc/xsl/isc-docbook-html.xsl doc/xsl/isc-docbook-latex.xsl doc/xsl/isc-manpage.xsl isc-config.sh lib/Makefile lib/bind9/Makefile lib/bind9/include/Makefile lib/bind9/include/bind9/Makefile lib/dns/Makefile lib/dns/include/Makefile lib/dns/include/dns/Makefile lib/dns/include/dst/Makefile lib/dns/tests/Makefile lib/export/Makefile lib/export/dns/Makefile lib/export/dns/include/Makefile lib/export/dns/include/dns/Makefile lib/export/dns/include/dst/Makefile lib/export/irs/Makefile lib/export/irs/include/Makefile lib/export/irs/include/irs/Makefile lib/export/isc/$thread_dir/Makefile lib/export/isc/$thread_dir/include/Makefile lib/export/isc/$thread_dir/include/isc/Makefile lib/export/isc/Makefile lib/export/isc/include/Makefile lib/export/isc/include/isc/Makefile lib/export/isc/nls/Makefile lib/export/isc/unix/Makefile lib/export/isc/unix/include/Makefile lib/export/isc/unix/include/isc/Makefile lib/export/isccfg/Makefile lib/export/isccfg/include/Makefile lib/export/isccfg/include/isccfg/Makefile lib/export/samples/Makefile lib/export/samples/Makefile-postinstall lib/irs/Makefile lib/irs/include/Makefile lib/irs/include/irs/Makefile lib/irs/include/irs/netdb.h lib/irs/include/irs/platform.h lib/isc/$arch/Makefile lib/isc/$arch/include/Makefile lib/isc/$arch/include/isc/Makefile lib/isc/$thread_dir/Makefile lib/isc/$thread_dir/include/Makefile lib/isc/$thread_dir/include/isc/Makefile lib/isc/Makefile lib/isc/include/Makefile lib/isc/include/isc/Makefile lib/isc/include/isc/platform.h lib/isc/tests/Makefile lib/isc/nls/Makefile lib/isc/unix/Makefile lib/isc/unix/include/Makefile lib/isc/unix/include/isc/Makefile lib/isccc/Makefile lib/isccc/include/Makefile lib/isccc/include/isccc/Makefile lib/isccfg/Makefile lib/isccfg/include/Makefile lib/isccfg/include/isccfg/Makefile lib/lwres/Makefile lib/lwres/include/Makefile lib/lwres/include/lwres/Makefile lib/lwres/include/lwres/netdb.h lib/lwres/include/lwres/platform.h lib/lwres/man/Makefile lib/lwres/unix/Makefile lib/lwres/unix/include/Makefile lib/lwres/unix/include/lwres/Makefile lib/tests/Makefile lib/tests/include/Makefile lib/tests/include/tests/Makefile unit/Makefile unit/unittest.sh"
+ac_config_files="$ac_config_files make/Makefile make/mkdep Makefile bin/Makefile bin/check/Makefile bin/confgen/Makefile bin/confgen/unix/Makefile bin/dig/Makefile bin/dnssec/Makefile bin/named/Makefile bin/named/unix/Makefile bin/nsupdate/Makefile bin/pkcs11/Makefile bin/python/Makefile bin/python/dnssec-checkds.py bin/python/dnssec-coverage.py bin/rndc/Makefile bin/tests/Makefile bin/tests/atomic/Makefile bin/tests/db/Makefile bin/tests/dst/Makefile bin/tests/dst/Kdh.+002+18602.key bin/tests/dst/Kdh.+002+18602.private bin/tests/dst/Kdh.+002+48957.key bin/tests/dst/Kdh.+002+48957.private bin/tests/dst/Ktest.+001+00002.key bin/tests/dst/Ktest.+001+54622.key bin/tests/dst/Ktest.+001+54622.private bin/tests/dst/Ktest.+003+23616.key bin/tests/dst/Ktest.+003+23616.private bin/tests/dst/Ktest.+003+49667.key bin/tests/dst/dst_2_data bin/tests/dst/t2_data_1 bin/tests/dst/t2_data_2 bin/tests/dst/t2_dsasig bin/tests/dst/t2_rsasig bin/tests/hashes/Makefile bin/tests/headerdep_test.sh bin/tests/master/Makefile bin/tests/mem/Makefile bin/tests/names/Makefile bin/tests/net/Makefile bin/tests/rbt/Makefile bin/tests/resolver/Makefile bin/tests/sockaddr/Makefile bin/tests/system/Makefile bin/tests/system/conf.sh bin/tests/system/dlz/prereq.sh bin/tests/system/dlzexternal/Makefile bin/tests/system/dlzexternal/ns1/named.conf bin/tests/system/ecdsa/prereq.sh bin/tests/system/filter-aaaa/Makefile bin/tests/system/gost/prereq.sh bin/tests/system/inline/checkdsa.sh bin/tests/system/lwresd/Makefile bin/tests/system/rpz/Makefile bin/tests/system/rrl/Makefile bin/tests/system/rsabigexponent/Makefile bin/tests/system/tkey/Makefile bin/tests/system/tsiggss/Makefile bin/tests/tasks/Makefile bin/tests/timers/Makefile bin/tests/virtual-time/Makefile bin/tests/virtual-time/conf.sh bin/tools/Makefile contrib/check-secure-delegation.pl contrib/zone-edit.sh doc/Makefile doc/arm/Makefile doc/doxygen/Doxyfile doc/doxygen/Makefile doc/doxygen/doxygen-input-filter doc/misc/Makefile doc/xsl/Makefile doc/xsl/isc-docbook-chunk.xsl doc/xsl/isc-docbook-html.xsl doc/xsl/isc-docbook-latex.xsl doc/xsl/isc-manpage.xsl isc-config.sh lib/Makefile lib/bind9/Makefile lib/bind9/include/Makefile lib/bind9/include/bind9/Makefile lib/dns/Makefile lib/dns/include/Makefile lib/dns/include/dns/Makefile lib/dns/include/dst/Makefile lib/dns/tests/Makefile lib/export/Makefile lib/export/dns/Makefile lib/export/dns/include/Makefile lib/export/dns/include/dns/Makefile lib/export/dns/include/dst/Makefile lib/export/irs/Makefile lib/export/irs/include/Makefile lib/export/irs/include/irs/Makefile lib/export/isc/$thread_dir/Makefile lib/export/isc/$thread_dir/include/Makefile lib/export/isc/$thread_dir/include/isc/Makefile lib/export/isc/Makefile lib/export/isc/include/Makefile lib/export/isc/include/isc/Makefile lib/export/isc/nls/Makefile lib/export/isc/unix/Makefile lib/export/isc/unix/include/Makefile lib/export/isc/unix/include/isc/Makefile lib/export/isccfg/Makefile lib/export/isccfg/include/Makefile lib/export/isccfg/include/isccfg/Makefile lib/export/samples/Makefile lib/export/samples/Makefile-postinstall lib/irs/Makefile lib/irs/include/Makefile lib/irs/include/irs/Makefile lib/irs/include/irs/netdb.h lib/irs/include/irs/platform.h lib/isc/$arch/Makefile lib/isc/$arch/include/Makefile lib/isc/$arch/include/isc/Makefile lib/isc/$thread_dir/Makefile lib/isc/$thread_dir/include/Makefile lib/isc/$thread_dir/include/isc/Makefile lib/isc/Makefile lib/isc/include/Makefile lib/isc/include/isc/Makefile lib/isc/include/isc/platform.h lib/isc/tests/Makefile lib/isc/nls/Makefile lib/isc/unix/Makefile lib/isc/unix/include/Makefile lib/isc/unix/include/isc/Makefile lib/isccc/Makefile lib/isccc/include/Makefile lib/isccc/include/isccc/Makefile lib/isccfg/Makefile lib/isccfg/include/Makefile lib/isccfg/include/isccfg/Makefile lib/lwres/Makefile lib/lwres/include/Makefile lib/lwres/include/lwres/Makefile lib/lwres/include/lwres/netdb.h lib/lwres/include/lwres/platform.h lib/lwres/man/Makefile lib/lwres/unix/Makefile lib/lwres/unix/include/Makefile lib/lwres/unix/include/lwres/Makefile lib/tests/Makefile lib/tests/include/Makefile lib/tests/include/tests/Makefile unit/Makefile unit/unittest.sh"
 
 
 #
@@ -21384,11 +21353,29 @@ do
     "bin/named/unix/Makefile") CONFIG_FILES="$CONFIG_FILES bin/named/unix/Makefile" ;;
     "bin/nsupdate/Makefile") CONFIG_FILES="$CONFIG_FILES bin/nsupdate/Makefile" ;;
     "bin/pkcs11/Makefile") CONFIG_FILES="$CONFIG_FILES bin/pkcs11/Makefile" ;;
+    "bin/python/Makefile") CONFIG_FILES="$CONFIG_FILES bin/python/Makefile" ;;
+    "bin/python/dnssec-checkds.py") CONFIG_FILES="$CONFIG_FILES bin/python/dnssec-checkds.py" ;;
+    "bin/python/dnssec-coverage.py") CONFIG_FILES="$CONFIG_FILES bin/python/dnssec-coverage.py" ;;
     "bin/rndc/Makefile") CONFIG_FILES="$CONFIG_FILES bin/rndc/Makefile" ;;
     "bin/tests/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/Makefile" ;;
     "bin/tests/atomic/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/atomic/Makefile" ;;
     "bin/tests/db/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/db/Makefile" ;;
     "bin/tests/dst/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Makefile" ;;
+    "bin/tests/dst/Kdh.+002+18602.key") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Kdh.+002+18602.key" ;;
+    "bin/tests/dst/Kdh.+002+18602.private") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Kdh.+002+18602.private" ;;
+    "bin/tests/dst/Kdh.+002+48957.key") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Kdh.+002+48957.key" ;;
+    "bin/tests/dst/Kdh.+002+48957.private") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Kdh.+002+48957.private" ;;
+    "bin/tests/dst/Ktest.+001+00002.key") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Ktest.+001+00002.key" ;;
+    "bin/tests/dst/Ktest.+001+54622.key") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Ktest.+001+54622.key" ;;
+    "bin/tests/dst/Ktest.+001+54622.private") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Ktest.+001+54622.private" ;;
+    "bin/tests/dst/Ktest.+003+23616.key") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Ktest.+003+23616.key" ;;
+    "bin/tests/dst/Ktest.+003+23616.private") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Ktest.+003+23616.private" ;;
+    "bin/tests/dst/Ktest.+003+49667.key") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/Ktest.+003+49667.key" ;;
+    "bin/tests/dst/dst_2_data") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/dst_2_data" ;;
+    "bin/tests/dst/t2_data_1") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/t2_data_1" ;;
+    "bin/tests/dst/t2_data_2") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/t2_data_2" ;;
+    "bin/tests/dst/t2_dsasig") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/t2_dsasig" ;;
+    "bin/tests/dst/t2_rsasig") CONFIG_FILES="$CONFIG_FILES bin/tests/dst/t2_rsasig" ;;
     "bin/tests/hashes/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/hashes/Makefile" ;;
     "bin/tests/headerdep_test.sh") CONFIG_FILES="$CONFIG_FILES bin/tests/headerdep_test.sh" ;;
     "bin/tests/master/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/master/Makefile" ;;
@@ -21406,8 +21393,11 @@ do
     "bin/tests/system/ecdsa/prereq.sh") CONFIG_FILES="$CONFIG_FILES bin/tests/system/ecdsa/prereq.sh" ;;
     "bin/tests/system/filter-aaaa/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/filter-aaaa/Makefile" ;;
     "bin/tests/system/gost/prereq.sh") CONFIG_FILES="$CONFIG_FILES bin/tests/system/gost/prereq.sh" ;;
+    "bin/tests/system/inline/checkdsa.sh") CONFIG_FILES="$CONFIG_FILES bin/tests/system/inline/checkdsa.sh" ;;
     "bin/tests/system/lwresd/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/lwresd/Makefile" ;;
     "bin/tests/system/rpz/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/rpz/Makefile" ;;
+    "bin/tests/system/rrl/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/rrl/Makefile" ;;
+    "bin/tests/system/rsabigexponent/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/rsabigexponent/Makefile" ;;
     "bin/tests/system/tkey/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/tkey/Makefile" ;;
     "bin/tests/system/tsiggss/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/system/tsiggss/Makefile" ;;
     "bin/tests/tasks/Makefile") CONFIG_FILES="$CONFIG_FILES bin/tests/tasks/Makefile" ;;
@@ -22725,7 +22715,15 @@ fi
   chmod +x "$ofile"
 
  ;;
-    "atf-config":C) cd unit/atf-src; ${SHELL} ./configure MISSING=: --prefix $atfdir; cd ../.. ;;
+    "atf-config":C) (
+		 mkdir -p unit/atf-src;
+		 cd unit/atf-src;
+		 case "$srcdir" in
+		 /*) ;;
+		 *) srcdir="../../$srcdir";;
+		 esac
+		 ${SHELL} "${srcdir}${srcdir:+/unit/atf-src/}./configure" --enable-tools --disable-shared MISSING=: --prefix $atfdir;
+		)  ;;
     "chmod":C) chmod a+x isc-config.sh doc/doxygen/doxygen-input-filter ;;
 
   esac
@@ -22782,6 +22780,93 @@ yes)
 	make clean
 	;;
 esac
+
+# Check whether --enable-full-report was given.
+if test "${enable_full_report+set}" = set; then :
+  enableval=$enable_full_report;
+fi
+
+
+echo "========================================================================"
+echo "Configuration summary:"
+echo "------------------------------------------------------------------------"
+echo "Optional features enabled:"
+$use_threads && echo "    Multiprocessing support (--enable-threads)"
+
+test "$enable_rrl" = "yes" && \
+    echo "    Response Rate Limiting (--enable-rrl)"
+test "$use_gssapi" = "no" || echo "    GSS-API (--with-gssapi)"
+test "$use_pkcs11" = "no" || echo "    PKCS#11/Cryptoki support (--with-pkcs11)"
+test "$enable_newstats" = "yes" && \
+    echo "    New statistics (--enable-newstats)"
+test "$enable_fixed" = "yes" && \
+    echo "    Allow 'fixed' rrset-order (--enable-fixed-rrset)"
+test "$enable_filter" = "yes" && \
+    echo "    AAAA filtering (--enable-filter-aaaa)"
+test "$want_backtrace" = "yes" && \
+    echo "    Print backtrace on crash (--enable-backtrace)"
+test "$want_symtable" = "minimal" && \
+    echo "    Use symbol table for backtrace, named only (--enable-symtable)"
+test "$want_symtable" = "yes" -o "$want_symtable" = "all" && \
+    echo "    Use symbol table for backtrace, all binaries (--enable-symtable=all)"
+test "$atf" = "no" || echo "    Automated Testing Framework (--with-atf)"
+
+# these lines are only printed if run with --enable-full-report
+if test "$enable_full_report" = "yes"; then
+    test "$enable_ipv6" = "no" -o "$found_ipv6" = "no" || \
+        echo "    IPv6 support (--enable-ipv6)"
+    test "X$USE_OPENSSL" = "X" || \
+            echo "    OpenSSL cryptography/DNSSEC (--with-openssl)"
+    test "$OPENSSL_GOST" != "yes" || \
+            echo "    GOST algorithm support (--with-gost)"
+    test "$OPENSSL_ECDSA" != "yes" || \
+            echo "    ECDSA algorithm support (--with-ecdsa)"
+    test "X$PYTHON" = "X" || echo "    Python tools (--with-python)"
+    test "X$libxml2_libs" = "X" || echo "    XML statistics (--with-libxml2)"
+fi
+
+echo "    Dynamically loadable zone (DLZ) drivers:"
+test "$use_dlz_bdb" = "no" || \
+    echo "        Berkeley DB (--with-dlz-bdb)"
+test "$use_dlz_ldap" = "no" || \
+    echo "        LDAP (--with-dlz-ldap)"
+test "$use_dlz_mysql" = "no" || \
+    echo "        MySQL (--with-dlz-mysql)"
+test "$use_dlz_odbc" = "no" || \
+    echo "        ODBC (--with-dlz-bdb)"
+test "$use_dlz_postgres" = "no" || \
+    echo "        Postgres (--with-dlz-postgres)"
+test "$use_dlz_filesystem" = "no" || \
+    echo "        Filesystem (--with-dlz-filesystem)"
+test "$use_dlz_stub" = "no" || \
+    echo "        Stub (--with-dlz-stub)"
+test "$use_dlz_bdb $use_dlz_ldap $use_dlz_mysql $use_dlz_odbc $use_dlz_postgres $use_dlz_filesystem $use_dlz_stub" = "no no no no no no no" && echo "        None"
+echo
+
+echo "Features disabled or unavailable on this platform:"
+$use_threads || echo "    Multiprocessing support (--enable-threads)"
+test "$enable_ipv6" = "no" -o "$found_ipv6" = "no" && \
+        echo "    IPv6 support (--enable-ipv6)"
+test "$enable_rrl" = "yes" || \
+    echo "    Response Rate Limiting (--enable-rrl)"
+test "$use_gssapi" = "no" && echo "    GSS-API (--with-gssapi)"
+test "$use_pkcs11" = "no" && echo "    PKCS#11/Cryptoki support (--with-pkcs11)"
+test "X$enable_newstats" = "X" && echo "    New statistics (--enable-newstats)"
+test "$enable_fixed" = "yes" || \
+    echo "    Allow 'fixed' rrset-order (--enable-fixed-rrset)"
+test "$want_backtrace" = "yes" || \
+    echo "    Print backtrace on crash (--enable-backtrace)"
+test "$atf" = "no" && echo "    Automated Testing Framework (--with-atf)"
+test "X$USE_OPENSSL" = "X" && \
+        echo "    OpenSSL cryptography/DNSSEC (--with-openssl)"
+test "X$USE_OPENSSL" != "X" -a "$OPENSSL_GOST" != "yes" && \
+    echo "    GOST algorithm support (--with-gost)"
+test "X$USE_OPENSSL" != "X" -a "$OPENSSL_ECDSA" != "yes" && \
+    echo "    ECDSA algorithm support (--with-ecdsa)"
+test "X$PYTHON" = "X" && echo "    Python tools (--with-python)"
+test "X$libxml2_libs" = "X" && echo "    XML statistics (--with-libxml2)"
+
+echo "========================================================================"
 
 if test "X$USE_OPENSSL" = "X"; then
 cat << \EOF

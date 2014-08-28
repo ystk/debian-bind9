@@ -1,4 +1,4 @@
-; Copyright (C) 2012-2013  Internet Systems Consortium, Inc. ("ISC")
+; Copyright (C) 2013  Internet Systems Consortium, Inc. ("ISC")
 ;
 ; Permission to use, copy, modify, and/or distribute this software for any
 ; purpose with or without fee is hereby granted, provided that the above
@@ -22,4 +22,4 @@ $TTL	120
 		NS	.
 ns		A	10.53.0.3
 
-*.a3		A	192.168.3.3
+*.a3		A	192.0.3.3

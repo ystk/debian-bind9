@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2013  Internet Systems Consortium, Inc. ("ISC")
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -71,6 +71,8 @@ typedef struct dns_rrl_hash dns_rrl_hash_t;
 typedef enum {
 	DNS_RRL_RTYPE_FREE = 0,
 	DNS_RRL_RTYPE_QUERY,
+	DNS_RRL_RTYPE_REFERRAL,
+	DNS_RRL_RTYPE_NODATA,
 	DNS_RRL_RTYPE_NXDOMAIN,
 	DNS_RRL_RTYPE_ERROR,
 	DNS_RRL_RTYPE_ALL,
@@ -93,8 +95,8 @@ union dns_rrl_key {
 		isc_uint32_t	    ip[DNS_RRL_MAX_PREFIX/32];
 		isc_uint32_t	    qname_hash;
 		dns_rdatatype_t	    qtype;
-		isc_uint8_t	    qclass;
-		dns_rrl_rtype_t	    rtype   :3;
+		isc_uint8_t         qclass;
+		dns_rrl_rtype_t	    rtype   :4; /* 3 bits + sign bit */
 		isc_boolean_t	    ipv6    :1;
 	} s;
 	isc_uint16_t	w[1];
@@ -112,7 +114,6 @@ struct dns_rrl_entry {
 	dns_rrl_key_t	key;
 # define DNS_RRL_RESPONSE_BITS	24
 	signed int	responses   :DNS_RRL_RESPONSE_BITS;
-	isc_boolean_t	logged	    :1;
 # define DNS_RRL_QNAMES_BITS	8
 	unsigned int	log_qname   :DNS_RRL_QNAMES_BITS;
 
@@ -121,28 +122,41 @@ struct dns_rrl_entry {
 	isc_boolean_t	ts_valid    :1;
 # define DNS_RRL_HASH_GEN_BITS	1
 	unsigned int	hash_gen    :DNS_RRL_HASH_GEN_BITS;
+	isc_boolean_t	logged	    :1;
+# define DNS_RRL_LOG_BITS	11
+	unsigned int	log_secs    :DNS_RRL_LOG_BITS;
+
+# define DNS_RRL_TS_BITS	12
+	unsigned int	ts	    :DNS_RRL_TS_BITS;
+
 # define DNS_RRL_MAX_SLIP	10
 	unsigned int	slip_cnt    :4;
-# define DNS_RRL_TS_BITS	10
-	unsigned int	ts	    :DNS_RRL_TS_BITS;
-	unsigned int	log_secs    :DNS_RRL_TS_BITS;
 };
 
 #define DNS_RRL_MAX_TIME_TRAVEL	5
-#define DNS_RRL_FOREVER		(1<<DNS_RRL_RESPONSE_BITS)
-#define DNS_RRL_MAX_TS		((1<<DNS_RRL_TS_BITS) - 1)
+#define DNS_RRL_FOREVER		(1<<DNS_RRL_TS_BITS)
+#define DNS_RRL_MAX_TS		(DNS_RRL_FOREVER - 1)
 
 #define DNS_RRL_MAX_RESPONSES	((1<<(DNS_RRL_RESPONSE_BITS-1))-1)
-#define DNS_RRL_MAX_WINDOW	600
+#define DNS_RRL_MAX_WINDOW	3600
 #if DNS_RRL_MAX_WINDOW >= DNS_RRL_MAX_TS
 #error "DNS_RRL_MAX_WINDOW is too large"
 #endif
-#define DNS_RRL_MAX_RATE	(DNS_RRL_MAX_RESPONSES / DNS_RRL_MAX_WINDOW)
+#define DNS_RRL_MAX_RATE	1000
+#if DNS_RRL_MAX_RATE >= (DNS_RRL_MAX_RESPONSES / DNS_RRL_MAX_WINDOW)
+#error "DNS_RRL_MAX_rate is too large"
+#endif
 
-#define DNS_RRL_MAX_LOG_SECS	900
-#define DNS_RRL_STOP_LOG_SECS	60
-#if DNS_RRL_MAX_LOG_SECS >= (1<<DNS_RRL_TS_BITS)
+#if (1<<DNS_RRL_LOG_BITS) >= DNS_RRL_FOREVER
+#error DNS_RRL_LOG_BITS is too big
+#endif
+#define DNS_RRL_MAX_LOG_SECS	1800
+#if DNS_RRL_MAX_LOG_SECS >= (1<<DNS_RRL_LOG_BITS)
 #error "DNS_RRL_MAX_LOG_SECS is too large"
+#endif
+#define DNS_RRL_STOP_LOG_SECS	60
+#if DNS_RRL_STOP_LOG_SECS >= (1<<DNS_RRL_LOG_BITS)
+#error "DNS_RRL_STOP_LOG_SECS is too large"
 #endif
 
 
@@ -177,6 +191,13 @@ struct dns_rrl_qname_buf {
 	dns_fixedname_t	    qname;
 };
 
+typedef struct dns_rrl_rate dns_rrl_rate_t;
+struct dns_rrl_rate {
+	int	    r;
+	int	    scaled;
+	const char  *str;
+};
+
 /*
  * Per-view query rate limit parameters and a pointer to database.
  */
@@ -186,12 +207,14 @@ struct dns_rrl {
 	isc_mem_t	*mctx;
 
 	isc_boolean_t	log_only;
-	int		responses_per_second;
-	int		errors_per_second;
-	int		nxdomains_per_second;
-	int		all_per_second;
+	dns_rrl_rate_t	responses_per_second;
+	dns_rrl_rate_t	referrals_per_second;
+	dns_rrl_rate_t	nodata_per_second;
+	dns_rrl_rate_t	nxdomains_per_second;
+	dns_rrl_rate_t	errors_per_second;
+	dns_rrl_rate_t	all_per_second;
+	dns_rrl_rate_t	slip;
 	int		window;
-	int		slip;
 	double		qps_scale;
 	int		max_entries;
 
@@ -202,11 +225,6 @@ struct dns_rrl {
 	int		qps_responses;
 	isc_stdtime_t	qps_time;
 	double		qps;
-	int		scaled_responses_per_second;
-	int		scaled_errors_per_second;
-	int		scaled_nxdomains_per_second;
-	int		scaled_all_per_second;
-	int		scaled_slip;
 
 	unsigned int	probes;
 	unsigned int	searches;
@@ -246,7 +264,7 @@ dns_rrl_result_t
 dns_rrl(dns_view_t *view,
 	const isc_sockaddr_t *client_addr, isc_boolean_t is_tcp,
 	dns_rdataclass_t rdclass, dns_rdatatype_t qtype,
-	dns_name_t *qname, dns_rcode_t rcode, isc_stdtime_t now,
+	dns_name_t *qname, isc_result_t resp_result, isc_stdtime_t now,
 	isc_boolean_t wouldlog, char *log_buf, unsigned int log_buf_len);
 
 void
