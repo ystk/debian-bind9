@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2007, 2009, 2011, 2012  Internet Systems Consortium, Inc. ("ISC")
+ * Copyright (C) 2004-2007, 2009, 2011-2013  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1999-2001, 2003  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -15,7 +15,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id$ */
+/* $Id: log.h,v 1.47 2011/10/13 22:48:24 tbox Exp $ */
 
 /*! \file dns/log.h
  * \author  Principal Authors: DCL */
@@ -43,6 +43,7 @@ LIBDNS_EXTERNAL_DATA extern isc_logmodule_t dns_modules[];
 #define DNS_LOGCATEGORY_DELEGATION_ONLY	(&dns_categories[10])
 #define DNS_LOGCATEGORY_EDNS_DISABLED	(&dns_categories[11])
 #define DNS_LOGCATEGORY_RPZ		(&dns_categories[12])
+#define DNS_LOGCATEGORY_RRL		(&dns_categories[13])
 
 /* Backwards compatibility. */
 #define DNS_LOGCATEGORY_GENERAL		ISC_LOGCATEGORY_GENERAL
