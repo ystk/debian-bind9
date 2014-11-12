@@ -1,3 +1,13 @@
+bind9 (1:9.7.3.dfsg-1~squeeze12) squeeze-lts; urgency=medium
+
+  * Non-maintainer upload by the Squeeze LTS Team.
+  * Fix CVE-2014-0591: denial of service when processing NSEC3-signed zone
+    queries, fixed by not calling memcpy with overlapping ranges in
+    bin/named/query.c. - patch backported from 9.8.6-P2 by Marc Deslauriers
+    from the Ubuntu Security team.
+
+ -- Holger Levsen <holger@debian.org>  Fri, 05 Sep 2014 18:11:18 +0200
+
 bind9 (1:9.7.3.dfsg-1~squeeze11) squeeze-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
