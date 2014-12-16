@@ -1,3 +1,21 @@
+bind9 (1:9.7.3.dfsg-1~squeeze13) squeeze-lts; urgency=medium
+
+  * Non-maintainer upload by the Squeeze LTS Team.
+  * SECURITY UPDATE: denial of service via delegation handling defect
+    - limit max recursion in bin/named/config.c, bin/named/query.c,
+      bin/named/server.c, lib/dns/adb.c, lib/dns/include/dns/adb.h,
+      lib/dns/include/dns/resolver.h, lib/dns/resolver.c,
+      lib/export/isc/Makefile.in, lib/isc/Makefile.in, lib/isc/counter.c,
+      lib/isc/include/isc/counter.h, lib/isc/include/isc/Makefile.in,
+      lib/isc/include/isc/types.h, lib/isc/tests/counter_test.c,
+      lib/isccfg/namedconf.c.
+    - Based on patch provided by upstream.
+    - CVE-2014-8500
+  * Based on 1:9.7.0.dfsg.P1-1ubuntu0.12 provided by Marc Deslauriers from the
+    Canonical Security Team. Thanks Marc!
+
+ -- Holger Levsen <holger@debian.org>  Mon, 15 Dec 2014 18:18:15 +0100
+
 bind9 (1:9.7.3.dfsg-1~squeeze12) squeeze-lts; urgency=medium
 
   * Non-maintainer upload by the Squeeze LTS Team.
