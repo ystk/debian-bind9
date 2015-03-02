@@ -1,3 +1,13 @@
+bind9 (1:9.7.3.dfsg-1~squeeze14) squeeze-lts; urgency=high
+
+  * Non-maintainer upload by the Squeeze LTS Team.
+  * CVE-2015-1349: avoid crash due to managed-key rollover.
+    Revoking a managed trust anchor and supplying an untrusted replacement
+    could cause named to crash with an assertion failure.
+    (Closes: #778733)
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Sun, 01 Mar 2015 13:47:15 +0100
+
 bind9 (1:9.7.3.dfsg-1~squeeze13) squeeze-lts; urgency=medium
 
   * Non-maintainer upload by the Squeeze LTS Team.
