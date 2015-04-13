@@ -28,7 +28,7 @@ NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 export MAKEFLAGS += -j$(NUMJOBS)
 endif
 
-export CFLAGS=-fno-strict-aliasing -DDIG_SIGCHASE $(DEBUG) $(OPT)
+export CFLAGS=-fno-strict-aliasing -fno-delete-null-pointer-checks -DDIG_SIGCHASE $(DEBUG) $(OPT)
 
 ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
 EXTRA_FEATURES=--disable-linux-caps --disable-threads
@@ -39,6 +39,23 @@ configure-stamp:
 	dh_testdir
 	dh_autotools-dev_updateconfig
 	dh_autoreconf
+	test -e export || mkdir export && cp -r * export || true
+	cd export && ./configure \
+		--prefix=/usr \
+		--disable-epoll \
+		--disable-kqueue \
+		--disable-devpoll \
+		--disable-threads \
+		--disable-linux-caps \
+		--without-openssl \
+		--without-libxml2 \
+		--enable-ipv6 \
+		--enable-shared \
+		--enable-exportlib \
+		--with-libtool \
+		--with-gssapi=no \
+		--with-export-libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
+		--with-export-includedir=\$${prefix}/include/bind-export
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
@@ -64,6 +81,7 @@ configure-stamp:
 build: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
+	$(MAKE) -C export
 	LD_LIBRARY_PATH=$$(pwd)/lib/isc/.libs:$$(pwd)/lib/isccc/.libs:$$(pwd)/isccfg/.libs:$${LD_LIBRARY_PATH} $(MAKE)
 	touch $@
 
@@ -85,6 +103,7 @@ clean:
 	rm -f debian/substvars lib/bind/include/isc/platform.h
 	rm -f contrib/dlz/bin/dlzbdb/Makefile contrib/dlz/drivers/rules
 	rm -f doc/arm/Bv9ARM.pdf
+	rm -rf export
 	dh_autoreconf_clean
 	dh_autotools-dev_restoreconfig
 	dh_clean
@@ -105,8 +124,16 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
+	$(MAKE) -C export install DESTDIR=`pwd`/debian/bind9
 	$(MAKE) install DESTDIR=`pwd`/debian/bind9
-	rm -f debian/bind9/usr/lib/*.la
+	rm -rf debian/bind9/usr/etc
+	find debian/bind9 -name \*.la -execdir rm -f {} \;
+	mkdir -p debian/bind9/lib/$(DEB_HOST_MULTIARCH)
+	mv debian/bind9/usr/lib/$(DEB_HOST_MULTIARCH)/*-export.so.* debian/bind9/lib/$(DEB_HOST_MULTIARCH)
+	cd debian/bind9/usr/lib/$(DEB_HOST_MULTIARCH) && for link in *.so; do \
+	    file=$$(readlink $$link); \
+	    ln -sf ../../../lib/$(DEB_HOST_MULTIARCH)/$$file $$link; \
+	    done
 	install -c -o bin -g bin -m 444 debian/db.0 ${ETCBIND}/db.0
 	install -c -o bin -g bin -m 444 debian/db.0 ${ETCBIND}/db.255
 	install -c -o bin -g bin -m 444 debian/db.empty ${ETCBIND}
@@ -180,8 +207,12 @@ binary-arch: build install
 	dh_compress -a
 	dh_fixperms -a
 	dh_makeshlibs -a
+	dh_makeshlibs -plibirs-export91 --add-udeb=libirs-export91-udeb
+	dh_makeshlibs -plibisc-export95 --add-udeb=libisc-export95-udeb
+	dh_makeshlibs -plibdns-export100 --add-udeb=libdns-export100-udeb
+	dh_makeshlibs -plibisccfg-export90 --add-udeb=libisccfg-export90-udeb
 	dh_installdeb -a
-	dh_shlibdeps -l"debian/libbind9-90/usr/lib:debian/libbind-dev/usr/lib:debian/libdns100/usr/lib:debian/libisc95/usr/lib:debian/libisccc90/usr/lib:debian/libisccfg90/usr/lib:debian/liblwres90/usr/lib:/usr/lib/libfakeroot" -a
+	dh_shlibdeps -a
 	for i in $$(sed -n '/^Package:/s/^.* //p' debian/control); do cat debian/vars.in >> debian/$$i.substvars; done
 	cat debian/vars.in >> debian/substvars
 	dh_gencontrol -a

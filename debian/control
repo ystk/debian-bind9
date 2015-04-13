@@ -2,7 +2,7 @@ Source: bind9
 Section: net
 Priority: optional
 Maintainer: LaMont Jones <lamont@debian.org>
-Uploaders: Bdale Garbee <bdale@gag.com>
+Uploaders: Michael Gilbert <mgilbert@debian.org>
 Build-Depends: libkrb5-dev, debhelper (>= 5), libssl-dev, libtool, bison, libdb-dev (>>4.6), libldap2-dev, libxml2-dev, libcap2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], hardening-wrapper, libgeoip-dev (>= 1.4.6.dfsg-5), dpkg-dev (>= 1.15.5), python, python-argparse, dh-systemd, autotools-dev, dh-autoreconf
 Build-Conflicts: libdb4.2-dev
 Standards-Version: 3.7.3.0
@@ -60,7 +60,7 @@ Section: libdevel
 Architecture: any
 Conflicts: bind-dev
 Replaces: bind-dev
-Depends: ${shlibs:Depends}, ${misc:Depends}, libdns100 (=${binary:Version}), libisccfg90 (=${binary:Version}), libisc95 (=${binary:Version}), liblwres90 (=${binary:Version}), libbind9-90 (=${binary:Version})
+Depends: ${misc:Depends}, libdns100 (=${binary:Version}), libisccfg90 (=${binary:Version}), libisc95 (=${binary:Version}), liblwres90 (=${binary:Version}), libbind9-90 (=${binary:Version})
 Description: Static Libraries and Headers used by BIND
  This package delivers archive-style libraries, header files, and API man
  pages for libbind, libdns, libisc, and liblwres.  These are only needed 
@@ -171,3 +171,81 @@ Description: Lightweight Resolver Daemon
  the BIND 9 lightweight resolver library.  It is essentially a stripped-
  down, caching-only name server that answers queries using the BIND 9
  lightweight resolver protocol rather than the DNS protocol.
+
+Package: libbind-export-dev
+Section: libdevel
+Architecture: any
+Conflicts: libbind-dev
+Depends: ${misc:Depends}, libdns-export100 (=${binary:Version}), libisccfg-export90 (=${binary:Version}), libisc-export95 (=${binary:Version}), libirs-export91 (=${binary:Version})
+Description: Development files for the exported BIND libraries
+ ${Description}
+ .
+ This package delivers development files for the exported BIND libraries.
+
+Package: libdns-export100
+Section: libs
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Exported DNS Shared Library
+ ${Description}
+ .
+ This package delivers the exported libdns shared library.
+
+Package: libdns-export100-udeb
+Section: debian-installer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Package-Type: udeb
+Description: Exported DNS library for debian-installer
+
+Package: libisc-export95
+Section: libs
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Exported ISC Shared Library 
+ ${Description}
+ .
+ This package delivers the exported libisc shared library.
+
+Package: libisc-export95-udeb
+Section: debian-installer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Package-Type: udeb
+Description: Exported ISC library for debian-installer
+
+Package: libisccfg-export90
+Section: libs
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Exported ISC CFG Shared Library
+ ${Description}
+ .
+ This package delivers the exported libisccfg shared library.
+
+Package: libisccfg-export90-udeb
+Section: debian-installer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Package-Type: udeb
+Description: Exported ISC CFG library for debian-installer
+
+Package: libirs-export91
+Section: libs
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Exported IRS Shared Library
+ ${Description}
+ .
+ This package delivers the exported libirs shared library.
+
+Package: libirs-export91-udeb
+Section: debian-installer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Package-Type: udeb
+Description: Exported IRS library for debian-installer
