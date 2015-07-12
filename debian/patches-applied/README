@@ -1,0 +1,4 @@
+The patches included in this directory are not applied during build
+time. They have been applied directly to the source code since bind9
+1:9.7.3.dfsg-1~squeeze15 revision, and they are here for documentation
+purposes.
