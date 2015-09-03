@@ -1,3 +1,9 @@
+bind9 (1:9.9.5.dfsg-9+deb8u3) jessie-security; urgency=medium
+
+  * CVE-2015-5722
+
+ -- Moritz Muehlenhoff <jmm@debian.org>  Wed, 02 Sep 2015 13:11:02 +0000
+
 bind9 (1:9.9.5.dfsg-9+deb8u2) jessie-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
