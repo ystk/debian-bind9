@@ -1,3 +1,13 @@
+bind9 (1:9.9.5.dfsg-9+deb8u4) jessie-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Add patch to fix CVE-2015-8000.
+    CVE-2015-8000: Insufficient testing when parsing a message allowed
+    records with an incorrect class to be be accepted, triggering a REQUIRE
+    failure when those records were subsequently cached.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Mon, 14 Dec 2015 20:02:04 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u3) jessie-security; urgency=medium
 
   * CVE-2015-5722
