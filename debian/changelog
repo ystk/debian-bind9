@@ -1,3 +1,14 @@
+bind9 (1:9.7.3.dfsg-1~squeeze18) squeeze-lts; urgency=medium
+
+  * Non-maintainer upload by the Squeeze LTS Team.
+  * Add patch to fix CVE-2015-8000.
+    CVE-2015-8000: Insufficient testing when parsing a message allowed
+    records with an incorrect class to be be accepted, triggering a REQUIRE
+    failure when those records were subsequently cached.
+    (patch borrowed from Wheezy, thanks to Salvatore Bonaccorso)
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Wed, 16 Dec 2015 22:35:15 +0100
+
 bind9 (1:9.7.3.dfsg-1~squeeze17) squeeze-lts; urgency=medium
 
   * Non-maintainer upload by the Squeeze LTS Team.

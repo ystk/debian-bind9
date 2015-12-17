@@ -6661,6 +6661,8 @@ resquery_response(isc_task_t *task, isc_event_t *event) {
 			goto done;
 	}
 
+    dns_message_setclass(message, fctx->res->rdclass);
+
 	result = dns_message_parse(message, &devent->buffer, 0);
 	if (result != ISC_R_SUCCESS) {
 		switch (result) {
@@ -6739,6 +6741,12 @@ resquery_response(isc_task_t *task, isc_event_t *event) {
 		}
 	}
 
+
+	if (message->rdclass != fctx->res->rdclass) {
+		resend = ISC_TRUE;
+		FCTXTRACE("bad class");
+		goto done;
+	}
 
 	/*
 	 * Log the incoming packet.
