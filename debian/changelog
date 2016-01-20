@@ -1,3 +1,12 @@
+bind9 (1:9.9.5.dfsg-9+deb8u5) jessie-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * CVE-2015-8704: Specific APL data could trigger an INSIST in apl_42.c.
+    A buffer size check used to guard against overflow could cause named to
+    exit with an INSIST failure In apl_42.c.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sat, 16 Jan 2016 10:51:37 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u4) jessie-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
