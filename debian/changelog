@@ -1,3 +1,12 @@
+bind9 (1:9.7.3.dfsg-1~squeeze19) squeeze-lts; urgency=high
+
+  * Non-maintainer upload.
+  * CVE-2015-8704: Specific APL data could trigger an INSIST in apl_42.c.
+    A buffer size check used to guard against overflow could cause named to
+    exit with an INSIST failure In apl_42.c.
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sun, 17 Jan 2016 11:11:14 +0100
+
 bind9 (1:9.7.3.dfsg-1~squeeze18) squeeze-lts; urgency=medium
 
   * Non-maintainer upload by the Squeeze LTS Team.
