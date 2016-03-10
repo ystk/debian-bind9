@@ -1,3 +1,10 @@
+bind9 (1:9.9.5.dfsg-9+deb8u6) jessie-security; urgency=high
+
+  * Fix CVE-2016-1285: error parsing control channel input.
+  * Fix CVE-2016-1286: error parsing DNAME resource records.
+
+ -- Michael Gilbert <mgilbert@debian.org>  Tue, 08 Mar 2016 00:40:53 +0000
+
 bind9 (1:9.9.5.dfsg-9+deb8u5) jessie-security; urgency=high
 
   * Non-maintainer upload by the Security Team.
