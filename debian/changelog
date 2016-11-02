@@ -1,3 +1,10 @@
+bind9 (1:9.9.5.dfsg-9+deb8u8) jessie-security; urgency=medium
+
+  * CVE-2016-8864: Fix assertion failure in DNAME processing with patch
+    provided by ISC.
+
+ -- Florian Weimer <fw@deneb.enyo.de>  Tue, 01 Nov 2016 17:51:22 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u7) jessie-security; urgency=high
 
   * CVE-2016-2775: lwresd crash with long query name.
