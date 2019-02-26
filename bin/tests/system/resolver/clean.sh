@@ -20,7 +20,7 @@
 # Clean up after resolver tests.
 #
 rm -f */named.memstats
-rm -f dig.out dig.*.out.*
+rm -f dig.out dig.*.out.* dig.out.*
 rm -f dig.*.foo.*
 rm -f dig.*.bar.*
 rm -f dig.*.prime.*

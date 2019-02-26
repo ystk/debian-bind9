@@ -169,6 +169,7 @@ echo "I:checking DNAME target filtering (deny)"
 ret=0
 $DIG +tcp foo.baddname.example.net @10.53.0.1 a -p 5300 > dig.out || ret=1
 grep "status: SERVFAIL" dig.out > /dev/null || ret=1
+grep "DNAME target foo.baddname.example.org denied for foo.baddname.example.net/IN" ns1/named.run >/dev/null || ret=1
 if [ $ret != 0 ]; then echo "I:failed"; fi
 status=`expr $status + $ret`
 
@@ -384,6 +385,23 @@ echo "I:check for improved error message with SOA mismatch ($n)"
 ret=0
 $DIG @10.53.0.1 -p 5300 www.sub.broken aaaa > dig.out.${n} || ret=1
 grep "not subdomain of zone" ns1/named.run > /dev/null || ret=1
+if [ $ret != 0 ]; then echo "I:failed"; fi
+status=`expr $status + $ret`
+
+n=`expr $n + 1`
+echo "I:checking explicit DNAME query ($n)"
+ret=0
+$DIG -p 5300  @10.53.0.7 dname short-dname.server > dig.ns7.out.$n 2>&1
+grep 'status: NOERROR' dig.ns7.out.$n > /dev/null 2>&1 || ret=1
+if [ $ret != 0 ]; then echo "I:failed"; fi
+status=`expr $status + $ret`
+
+n=`expr $n + 1`
+echo "I:checking DNAME via ANY query ($n)"
+ret=0
+$RNDC -c ../common/rndc.conf -s 10.53.0.7 -p 9953 flush 2>&1 | sed 's/^/I:ns7 /' 
+$DIG -p 5300  @10.53.0.7 any short-dname.server > dig.ns7.out.$n 2>&1
+grep 'status: NOERROR' dig.ns7.out.$n > /dev/null 2>&1 || ret=1
 if [ $ret != 0 ]; then echo "I:failed"; fi
 status=`expr $status + $ret`
 

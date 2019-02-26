@@ -1,3 +1,12 @@
+bind9 (1:9.9.5.dfsg-9+deb8u16) jessie-security; urgency=high
+
+  * Non-maintainer upload by the LTS Team. 
+  * CVE-2018-5740
+    The "deny-answer-aliases" feature in BIND has a flaw which can 
+    cause named to exit with an assertion failure.
+ 
+ -- Thorsten Alteholz <debian@alteholz.de>  Wed, 28 Aug 2018 18:03:02 +0200
+
 bind9 (1:9.9.5.dfsg-9+deb8u15) jessie-security; urgency=high
 
   * Non-maintainer upload by the Security Team.

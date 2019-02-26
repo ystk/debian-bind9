@@ -27,3 +27,8 @@ ns7			A	10.53.0.7
 ns			A	10.53.0.5
 child			NS	ns.child
 ns.child		A	10.53.0.5
+a.short                 A       10.0.0.1
+short-dname             DNAME   short
+a.longlonglonglonglonglonglonglonglonglonglonglonglong  A 10.0.0.2
+long-dname              DNAME   longlonglonglonglonglonglonglonglonglonglonglonglong
+
