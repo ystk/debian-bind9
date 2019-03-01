@@ -1,3 +1,15 @@
+bind9 (1:9.9.5.dfsg-9+deb8u17) jessie-security; urgency=high
+
+  * Non-maintainer upload by the LTS Team. 
+  * CVE-2019-6465
+    Zone transfer for DLZs are executed though not permitted by ACLs.
+  * CVE-2018-5745
+    Avoid assertion and thus causing named to deliberately exit when a
+    trust anchor's key is replaced with a key which uses an unsupported
+    algorithm.
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Thu, 28 Feb 2019 19:03:02 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u16) jessie-security; urgency=high
 
   * Non-maintainer upload by the LTS Team. 
