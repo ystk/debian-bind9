@@ -227,8 +227,9 @@ ns_interface_create(ns_interfacemgr_t *mgr, isc_sockaddr_t *addr,
 	 * connections will be handled in parallel even though there is
 	 * only one client initially.
 	 */
-	ifp->ntcptarget = 1;
-	ifp->ntcpcurrent = 0;
+	isc_refcount_init(&ifp->ntcpaccepting, 0);
+	isc_refcount_init(&ifp->ntcpactive, 0);
+
 	ifp->nudpdispatch = 0;
 
 	ISC_LINK_INIT(ifp, link);
@@ -356,9 +357,7 @@ ns_interface_accepttcp(ns_interface_t *ifp) {
 	 */
 	(void)isc_socket_filter(ifp->tcpsocket, "dataready");
 
-	result = ns_clientmgr_createclients(ifp->clientmgr,
-					    ifp->ntcptarget, ifp,
-					    ISC_TRUE);
+	result = ns_clientmgr_createclients(ifp->clientmgr, 1, ifp, ISC_TRUE);
 	if (result != ISC_R_SUCCESS) {
 		UNEXPECTED_ERROR(__FILE__, __LINE__,
 				 "TCP ns_clientmgr_createclients(): %s",
@@ -441,6 +440,9 @@ ns_interface_destroy(ns_interface_t *ifp) {
 	DESTROYLOCK(&ifp->lock);
 
 	ns_interfacemgr_detach(&ifp->mgr);
+
+	isc_refcount_destroy(&ifp->ntcpactive);
+	isc_refcount_destroy(&ifp->ntcpaccepting);
 
 	ifp->magic = 0;
 	isc_mem_put(mctx, ifp, sizeof(*ifp));

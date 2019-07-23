@@ -15,8 +15,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id$ */
-
 #ifndef NAMED_CLIENT_H
 #define NAMED_CLIENT_H 1
 
@@ -83,6 +81,13 @@
  *** Types
  ***/
 
+/*% reference-counted TCP connection object */
+typedef struct ns_tcpconn {
+       isc_refcount_t          refs;
+       isc_quota_t             *tcpquota;
+       isc_boolean_t           pipelined;
+} ns_tcpconn_t;
+
 /*% nameserver client structure */
 struct ns_client {
 	unsigned int		magic;
@@ -97,6 +102,7 @@ struct ns_client {
 	int			nupdates;
 	int			nctls;
 	int			references;
+        isc_boolean_t           tcpactive;
 	isc_boolean_t		needshutdown; 	/*
 						 * Used by clienttest to get
 						 * the client to go from
@@ -131,9 +137,9 @@ struct ns_client {
 	isc_stdtime_t		requesttime;
 	isc_stdtime_t		now;
 	dns_name_t		signername;   /*%< [T]SIG key name */
-	dns_name_t *		signer;	      /*%< NULL if not valid sig */
+	dns_name_t		*signer;      /*%< NULL if not valid sig */
 	isc_boolean_t		mortal;	      /*%< Die after handling request */
-	isc_quota_t		*tcpquota;
+        ns_tcpconn_t            *tcpconn;
 	isc_quota_t		*recursionquota;
 	ns_interface_t		*interface;
 	isc_sockaddr_t		peeraddr;

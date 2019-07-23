@@ -15,8 +15,6 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* $Id: interfacemgr.h,v 1.35 2011/07/28 23:47:58 tbox Exp $ */
-
 #ifndef NAMED_INTERFACEMGR_H
 #define NAMED_INTERFACEMGR_H 1
 
@@ -51,6 +49,7 @@
 #include <isc/magic.h>
 #include <isc/mem.h>
 #include <isc/socket.h>
+#include <isc/refcount.h>
 
 #include <dns/result.h>
 
@@ -80,9 +79,14 @@ struct ns_interface {
 	dns_dispatch_t *	udpdispatch[MAX_UDP_DISPATCH];
 						/*%< UDP dispatchers. */
 	isc_socket_t *		tcpsocket;	/*%< TCP socket. */
-	int			ntcptarget;	/*%< Desired number of concurrent
-						     TCP accepts */
-	int			ntcpcurrent;	/*%< Current ditto, locked */
+        isc_refcount_t          ntcpaccepting;  /*%< Number of clients
+                                                     ready to accept new
+                                                     TCP connections on this
+                                                     interface */
+        isc_refcount_t          ntcpactive;     /*%< Number of clients
+                                                     servicing TCP queries
+                                                     (whether accepting or
+                                                     connected) */
 	int			nudpdispatch;	/*%< Number of UDP dispatches */
 	ns_clientmgr_t *	clientmgr;	/*%< Client manager. */
 	ISC_LINK(ns_interface_t) link;
