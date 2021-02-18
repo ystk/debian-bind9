@@ -1,3 +1,13 @@
+bind9 (1:9.9.5.dfsg-9+deb8u20) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS Team. 
+  * CVE-2020-8622
+    Crafted responses to TSIG-signed requests could lead to an assertion
+    failure, causing the server to exit. This could be done by malicious
+    server operators or guessing attackers.
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Thu, 28 May 2020 21:03:02 +0200
+
 bind9 (1:9.9.5.dfsg-9+deb8u19) jessie-security; urgency=high
 
   * Non-maintainer upload by the LTS Team. 
