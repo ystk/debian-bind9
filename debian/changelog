@@ -1,3 +1,10 @@
+bind9 (1:9.9.5.dfsg-9+deb8u21) jessie-security; urgency=high
+
+  * CVE-2020-8625: Prevent a buffer overflow attack in the GSSAPI ("Generic
+    Security Services") security policy negotiation. (Closes: #983004)
+
+ -- Chris Lamb <lamby@debian.org>  Fri, 19 Feb 2021 08:43:18 +0000
+
 bind9 (1:9.9.5.dfsg-9+deb8u20) jessie-security; urgency=high
 
   * Non-maintainer upload by the ELTS Team. 
