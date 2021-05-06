@@ -54,6 +54,7 @@ configure-stamp:
 		--enable-exportlib \
 		--with-libtool \
 		--with-gssapi=no \
+		--disable-isc-spnego \
 		--with-export-libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
 		--with-export-includedir=\$${prefix}/include/bind-export
 	./configure --prefix=/usr \
@@ -68,6 +69,7 @@ configure-stamp:
 		--enable-static \
 		--with-openssl=/usr \
 		--with-gssapi=/usr \
+		--disable-isc-spnego \
 		--with-gnu-ld \
 		--with-geoip=/usr \
 		--with-atf=no \

@@ -80,7 +80,7 @@
 /*%
  * Note that "impmagic" is not the first four bytes of the struct, so
  * ISC_MAGIC_VALID cannot be used.
- */
+a */
 #define VALID_RBTDB(rbtdb)      ((rbtdb) != NULL && \
 				 (rbtdb)->common.impmagic == RBTDB_MAGIC)
 
@@ -6449,13 +6449,21 @@ addrdataset(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
 	REQUIRE(VALID_RBTDB(rbtdb));
 	INSIST(rbtversion == NULL || rbtversion->rbtdb == rbtdb);
 
-	if (rbtdb->common.methods == &zone_methods)
+	if (rbtdb->common.methods == &zone_methods) {
+		/*
+		 * SOA records are only allowed at top of zone.
+		 */
+		if (rdataset->type == dns_rdatatype_soa &&
+		    node != rbtdb->origin_node) {
+			return (DNS_R_NOTZONETOP);
+		}
 		REQUIRE(((rbtnode->nsec == DNS_RBT_NSEC_NSEC3 &&
 			  (rdataset->type == dns_rdatatype_nsec3 ||
 			   rdataset->covers == dns_rdatatype_nsec3)) ||
 			 (rbtnode->nsec != DNS_RBT_NSEC_NSEC3 &&
 			   rdataset->type != dns_rdatatype_nsec3 &&
 			   rdataset->covers != dns_rdatatype_nsec3)));
+	}
 
 	if (rbtversion == NULL) {
 		if (now == 0)
