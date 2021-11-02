@@ -1,3 +1,14 @@
+bind9 (1:9.9.5.dfsg-9+deb8u23) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS team.
+  * In BIND exploitation of broken authoritative servers using a flaw in
+    response processing can cause degradation in BIND resolver performance. The
+    way the lame cache is currently designed makes it possible for its internal
+    data structures to grow almost infinitely, which may cause significant
+    delays in client query processing.
+
+ -- Markus Koschany <apo@debian.org>  Tue, 02 Nov 2021 01:07:11 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u22) jessie-security; urgency=medium
 
   * Non-maintainer upload by the ELTS Team.
