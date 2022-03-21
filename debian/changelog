@@ -1,3 +1,13 @@
+bind9 (1:9.9.5.dfsg-9+deb8u24) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS team.
+  * Fix CVE-2021-25220:
+    When using forwarders, bogus NS records supplied by, or via, those
+    forwarders may be cached and used by named if it needs to recurse for any
+    reason, causing it to obtain and pass on potentially incorrect answers.
+
+ -- Markus Koschany <apo@debian.org>  Thu, 17 Mar 2022 14:55:34 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u23) jessie-security; urgency=high
 
   * Non-maintainer upload by the ELTS team.
