@@ -1,3 +1,12 @@
+bind9 (1:9.9.5.dfsg-9+deb8u25) jessie-security; urgency=high
+
+  * Non-maintainer upload by the ELTS team.
+  * The patch for CVE-2021-25220 caused a regression in the isc-dhcp-client
+    package which prevented network configuration via the dhclient. This patch
+    has been reverted until the regression can be properly addressed.
+
+ -- Markus Koschany <apo@debian.org>  Wed, 23 Mar 2022 00:09:50 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u24) jessie-security; urgency=high
 
   * Non-maintainer upload by the ELTS team.
