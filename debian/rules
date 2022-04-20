@@ -57,6 +57,7 @@ configure-stamp:
 		--disable-isc-spnego \
 		--with-export-libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH) \
 		--with-export-includedir=\$${prefix}/include/bind-export
+	patch -p1 < CVE-2021-25220.patch
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
