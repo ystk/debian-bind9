@@ -1,1 +1,11 @@
+CVE-2015-5722.patch
+CVE-2020-8622.patch
 CVE-2020-8625.patch
+0028-Free-resources-when-gss_accept_sec_context-fails.patch
+0029-Check-SOA-owner-names-in-zone-transfers.patch
+0030-Address-inconsistencies-in-checking-added-RRsets.patch
+0031-Unload-a-zone-if-a-transfer-breaks-its-SOA-record.patch
+0032-Handle-DNAME-lookup-via-itself.patch
+CVE-2021-25219.patch
+CVE-2022-2795.patch
+CVE-2022-38177.patch

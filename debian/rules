@@ -34,7 +34,10 @@ ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
 EXTRA_FEATURES=--disable-linux-caps --disable-threads
 endif
 
-configure: configure-stamp
+patch:
+	dh_quilt_patch
+
+configure: configure-stamp patch
 configure-stamp:
 	dh_testdir
 	dh_autotools-dev_updateconfig
@@ -97,7 +100,10 @@ autofiles:
 	rm -rf autom4te.cache
 	cp config.guess config.sub contrib/idn/idnkit-1.0-src/
 
-clean:
+unpatch:
+	dh_quilt_unpatch
+
+clean: unpatch
 	dh_testdir
 	dh_testroot
 	-$(MAKE) distclean

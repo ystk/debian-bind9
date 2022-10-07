@@ -1,3 +1,30 @@
+bind9 (1:9.9.5.dfsg-9+deb8u28) jessie-security; urgency=medium
+
+  * Non-maintainer upload by the ELTS Team.
+  * Build-depend on quilt, apply and clean up patches during the build.
+  * Make CVE-2020-8625 a real patch, and unapply it from the diff.gz and
+    from a half-applied state in .pc (looks like it had been applied with
+    quilt, was listed in d/p/series, but there was no .patch file).
+  * Move CVE-2015-5722.patch from ./ to debian/patches/ and apply it using
+    quilt, unapplying it from the .diff.gz.
+  * Use standalone CVE-2020-8622.patch from stretch, unapply it from the
+    .diff.gz.
+  * Move CVE-2021-25219 changes to a patch as well. Add CVE annotation to
+    1:9.9.5.dfsg-9+deb8u23 changelog entry.
+  * Move changes from CVE-2021-25214, CVE-2021-25215, CVE-2021-25216 to
+    standalone patches.
+  * With all patches applied, there's no diff between deb8u27 and deb8u28
+    up to this point, other than to the debian/ dir itself. All of these
+    changes have been done for maintainability purpuses, so that it's easier
+    to know what has changed and when, and it's easy for anyone to revert
+    a change if it was deemed necessary, as well as for security reviews.
+
+  * New security fixes addressed in this release:
+    - CVE-2022-2795: degraded performance when processing large delegations.
+    - CVE-2022-38177: memory leak in ECDSA verification.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Fri, 07 Oct 2022 11:44:29 +0200
+
 bind9 (1:9.9.5.dfsg-9+deb8u27) jessie-security; urgency=high
 
   * Non-maintainer upload by the ELTS team.
@@ -32,7 +59,7 @@ bind9 (1:9.9.5.dfsg-9+deb8u23) jessie-security; urgency=high
     response processing can cause degradation in BIND resolver performance. The
     way the lame cache is currently designed makes it possible for its internal
     data structures to grow almost infinitely, which may cause significant
-    delays in client query processing.
+    delays in client query processing (CVE-2021-25219).
 
  -- Markus Koschany <apo@debian.org>  Tue, 02 Nov 2021 01:07:11 +0100
 

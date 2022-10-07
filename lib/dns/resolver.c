@@ -7184,20 +7184,18 @@ resquery_response(isc_task_t *task, isc_event_t *event) {
 	/*
 	 * Is the server lame?
 	 */
-	if (!ISFORWARDER(query->addrinfo) && is_lame(fctx)) {
+	if (fctx->res->lame_ttl != 0 && !ISFORWARDER(query->addrinfo) &&
+	    is_lame(fctx)) {
 		inc_stats(fctx->res, dns_resstatscounter_lame);
 		log_lame(fctx, query->addrinfo);
-		if (fctx->res->lame_ttl != 0) {
-				result = dns_adb_marklame(fctx->adb, query->addrinfo,
-				  &fctx->name, fctx->type,
-				  now + fctx->res->lame_ttl);
-				if (result != ISC_R_SUCCESS) {
-					isc_log_write(dns_lctx, DNS_LOGCATEGORY_RESOLVER,
-						  DNS_LOGMODULE_RESOLVER, ISC_LOG_ERROR,
-						"could not mark server as lame: %s",
-						isc_result_totext(result));
-				}
-		}
+		result = dns_adb_marklame(fctx->adb, query->addrinfo,
+					  &fctx->name, fctx->type,
+					  now + fctx->res->lame_ttl);
+		if (result != ISC_R_SUCCESS)
+			isc_log_write(dns_lctx, DNS_LOGCATEGORY_RESOLVER,
+				      DNS_LOGMODULE_RESOLVER, ISC_LOG_ERROR,
+				      "could not mark server as lame: %s",
+				      isc_result_totext(result));
 		broken_server = DNS_R_LAME;
 		keep_trying = ISC_TRUE;
 		goto done;
@@ -8916,12 +8914,6 @@ dns_resolver_algorithm_supported(dns_resolver_t *resolver, dns_name_t *name,
 
 	REQUIRE(VALID_RESOLVER(resolver));
 
-	/*
-	 * DH is unsupported for DNSKEYs, see RFC 4034 sec. A.1.
-	 */
-	if ((alg == DST_ALG_DH) || (alg == DST_ALG_INDIRECT))
-		return (ISC_FALSE);
-
 #if USE_ALGLOCK
 	RWLOCK(&resolver->alglock, isc_rwlocktype_read);
 #endif
@@ -8941,7 +8933,6 @@ dns_resolver_algorithm_supported(dns_resolver_t *resolver, dns_name_t *name,
 #endif
 	if (found)
 		return (ISC_FALSE);
-
 	return (dst_algorithm_supported(alg));
 }
 

@@ -965,7 +965,6 @@ opensslrsa_fromdns(dst_key_t *key, isc_buffer_t *data) {
 	RSA *rsa;
 	isc_region_t r;
 	unsigned int e_bytes;
-	unsigned int length;
 #if USE_EVP
 	EVP_PKEY *pkey;
 #endif
@@ -973,7 +972,6 @@ opensslrsa_fromdns(dst_key_t *key, isc_buffer_t *data) {
 	isc_buffer_remainingregion(data, &r);
 	if (r.length == 0)
 		return (ISC_R_SUCCESS);
-	length = r.length;
 
 	rsa = RSA_new();
 	if (rsa == NULL)
@@ -984,18 +982,17 @@ opensslrsa_fromdns(dst_key_t *key, isc_buffer_t *data) {
 		RSA_free(rsa);
 		return (DST_R_INVALIDPUBLICKEY);
 	}
-	e_bytes = *r.base;
-	isc_region_consume(&r, 1);
+	e_bytes = *r.base++;
+	r.length--;
 
 	if (e_bytes == 0) {
 		if (r.length < 2) {
 			RSA_free(rsa);
 			return (DST_R_INVALIDPUBLICKEY);
 		}
-		e_bytes = (*r.base) << 8;
-		isc_region_consume(&r, 1);
-		e_bytes += *r.base;
-		isc_region_consume(&r, 1);
+		e_bytes = ((*r.base++) << 8);
+		e_bytes += *r.base++;
+		r.length -= 2;
 	}
 
 	if (r.length < e_bytes) {
@@ -1003,13 +1000,14 @@ opensslrsa_fromdns(dst_key_t *key, isc_buffer_t *data) {
 		return (DST_R_INVALIDPUBLICKEY);
 	}
 	rsa->e = BN_bin2bn(r.base, e_bytes, NULL);
-	isc_region_consume(&r, e_bytes);
+	r.base += e_bytes;
+	r.length -= e_bytes;
 
 	rsa->n = BN_bin2bn(r.base, r.length, NULL);
 
 	key->key_size = BN_num_bits(rsa->n);
 
-	isc_buffer_forward(data, length);
+	isc_buffer_forward(data, r.length);
 
 #if USE_EVP
 	pkey = EVP_PKEY_new();
