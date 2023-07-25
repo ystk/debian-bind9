@@ -1,3 +1,13 @@
+bind9 (1:9.9.5.dfsg-9+deb8u29) jessie-security; urgency=high
+
+  * Non-maintainer upload by the Debian ELTS Team.
+  * CVE-2023-2828: It was discovered that the effectiveness of the
+    cache-cleaning algorithm used in named(5) can be severely diminished by
+    querying the resolver for specific RRsets in a certain order, effectively
+    allowing the configured max-cache-size limit to be significantly exceeded.
+
+ -- Chris Lamb <lamby@debian.org>  Tue, 25 Jul 2023 10:36:56 +0100
+
 bind9 (1:9.9.5.dfsg-9+deb8u28) jessie-security; urgency=medium
 
   * Non-maintainer upload by the ELTS Team.
